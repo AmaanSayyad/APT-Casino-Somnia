@@ -10,7 +10,7 @@ const ProvablyFairSection = () => {
     {
       id: 1,
       title: 'Pyth Entropy Request',
-      description: 'When you start a game, a randomness request is sent to Pyth Network Entropy on Monad Network. The request includes a custom gas limit and required fee.',
+      description: 'When you start a game, a randomness request is sent to Pyth Network Entropy on Somnia Testnet Network. The request includes a custom gas limit and required fee.',
       icon: 'client-seed',
       code: 'import pythEntropyService from \'@/services/PythEntropyService\';\n\nconst result = await pythEntropyService.generateRandom(\'ROULETTE\', {\n  purpose: \'roulette_spin\',\n  gameType: \'ROULETTE\',\n  betAmount: 0.1\n});'
     },
@@ -24,7 +24,7 @@ const ProvablyFairSection = () => {
     {
       id: 3,
       title: 'On-Chain Verification',
-      description: 'All randomness requests and results are recorded on Monad Network blockchain, providing complete transparency and verifiability.',
+      description: 'All randomness requests and results are recorded on Somnia Testnet Network blockchain, providing complete transparency and verifiability.',
       icon: 'calculation',
       code: '// Verify randomness via Pyth Entropy Explorer\nconsole.log(\'Transaction:\', transactionHash);\nconsole.log(\'Explorer:\', explorerUrl);\nconsole.log(\'Arbiscan:\', `https://sepolia.arbiscan.io/tx/${transactionHash}`);'
     },
@@ -57,7 +57,7 @@ const ProvablyFairSection = () => {
                 <h3 className="text-white text-xl font-medium mb-4">What is Pyth Entropy?</h3>
                 <p className="text-white/80 mb-6">
                   Pyth Entropy is a decentralized randomness service that provides cryptographically secure random numbers on-chain.
-                  It aggregates randomness from multiple sources and makes it available to smart contracts on Monad Network.
+                  It aggregates randomness from multiple sources and makes it available to smart contracts on Somnia Testnet Network.
                 </p>
                 
                 <div className="bg-[#250020] p-4 rounded-lg mb-6 border-l-2 border-red-magic">

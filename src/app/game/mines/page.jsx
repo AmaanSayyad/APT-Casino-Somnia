@@ -25,6 +25,7 @@ import GameDetail from "@/components/GameDetail";
 import AIAutoBetting from "./components/AIAutoBetting";
 import AISettingsModal from "./components/AISettingsModal";
 import pythEntropyService from '@/services/PythEntropyService';
+import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
 
 export default function Mines() {
   // Game State
@@ -62,6 +63,9 @@ export default function Mines() {
   
   // Wallet connection
   const { isConnected, address } = useWalletStatus();
+  
+  // Somnia Game Logger
+  const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
   
   // Theme
   const { theme } = useTheme();
@@ -112,7 +116,7 @@ export default function Mines() {
   const handleFormSubmit = async (formData) => {
     try {
       console.log('🔮 PYTH ENTROPY: Initializing Mines game session...');
-      console.log('🔗 Network: Monad Network | Token: MON | Protocol: Pyth Entropy');
+      console.log('🔗 Network: Somnia Testnet Network | Token: MON | Protocol: Pyth Entropy');
       
       // Initialize Pyth Entropy
       console.log('🔮 PYTH ENTROPY: Initializing...');
@@ -215,6 +219,39 @@ export default function Mines() {
       };
       
       console.log('✅ PYTH ENTROPY: Mines randomness generated:', entropyProof);
+      
+      // Log game result to Somnia Testnet (non-blocking)
+      logGame({
+        gameType: 'MINES',
+        betAmount: (result.betAmount || 0).toString(),
+        result: {
+          minePositions: result.minePositions || [],
+          revealedPositions: result.revealedPositions || [],
+          hitMine: result.hitMine || false,
+          safeRevealed: result.safeRevealed || 0,
+          currentMultiplier: result.multiplier || 0
+        },
+        payout: (result.payout || 0).toString(),
+        entropyProof: {
+          requestId: entropyResult.entropyProof.requestId,
+          transactionHash: entropyResult.entropyProof.transactionHash
+        }
+      }).then(txHash => {
+        if (txHash) {
+          console.log('✅ Mines game logged to Somnia:', getExplorerUrl(txHash));
+          // Update game history with Somnia transaction hash
+          setGameHistory(prev => {
+            const updatedHistory = [...prev];
+            if (updatedHistory.length > 0) {
+              updatedHistory[0] = { ...updatedHistory[0], somniaTxHash: txHash };
+            }
+            return updatedHistory;
+          });
+        }
+      }).catch(error => {
+        console.warn('⚠️ Failed to log Mines game to Somnia:', error);
+      });
+      
     } catch (error) {
       console.error('❌ Error using Pyth Entropy for Mines game:', error);
     }

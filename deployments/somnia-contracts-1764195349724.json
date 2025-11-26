@@ -1,0 +1,16 @@
+{
+  "network": "somnia-testnet-testnet",
+  "chainId": "50312",
+  "deployer": "0xb424d2369F07b925D1218B08e56700AF5928287b",
+  "deploymentTime": "2025-11-26T22:15:42.496Z",
+  "contracts": {
+    "treasury": {
+      "address": "0xacA996A4d49e7Ed42dA68a20600F249BE6d024A4",
+      "transactionHash": "0x3e8ef5f48390dfbb0871043c2aa9190d841b2745c670fba07480f4bbfcf46669"
+    },
+    "gameLogger": {
+      "address": "0x649A1a3cf745d60C98C12f3c404E09bdBb4151db",
+      "transactionHash": "0xa69adcc4b812c98db40a101a469c977495ac2d9c065e111a817e41967d703f0d"
+    }
+  }
+}

@@ -1,48 +1,60 @@
 import { NextResponse } from 'next/server';
 import { ethers, JsonRpcProvider, Wallet } from 'ethers';
-import { TREASURY_CONFIG } from '@/config/treasury.js';
+import { somniaTestnetConfig } from '@/config/somniaTestnetConfig';
+import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '@/config/contracts';
 import PYTH_ENTROPY_CONFIG from '@/config/pythEntropy.js';
 
 export async function GET() {
   try {
-    const network = process.env.NEXT_PUBLIC_NETWORK || 'monad-testnet';
-    const networkConfig = PYTH_ENTROPY_CONFIG.getNetworkConfig(network);
+    // Use Somnia Testnet for treasury operations
+    const SOMNIA_RPC_URL = somniaTestnetConfig.rpcUrls.default.http[0];
+    const SOMNIA_TREASURY_PRIVATE_KEY = process.env.SOMNIA_TESTNET_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY;
     
-    if (!networkConfig) {
+    if (!SOMNIA_TREASURY_PRIVATE_KEY) {
       return NextResponse.json(
-        { error: 'Unsupported network' },
-        { status: 400 }
+        { error: 'Treasury not configured' },
+        { status: 500 }
       );
     }
 
-    // Create provider
-    const provider = new JsonRpcProvider(networkConfig.rpcUrl);
+    // Create provider for Somnia Testnet
+    const provider = new JsonRpcProvider(SOMNIA_RPC_URL);
     
     // Create treasury wallet
-    const treasuryWallet = new Wallet(TREASURY_CONFIG.PRIVATE_KEY, provider);
+    const treasuryWallet = new Wallet(SOMNIA_TREASURY_PRIVATE_KEY, provider);
     
-    // Get treasury balance
+    // Get treasury balance on Somnia
     const balance = await provider.getBalance(treasuryWallet.address);
-    const balanceInMon = ethers.formatEther(balance);
+    const balanceInSTT = ethers.formatEther(balance);
     
-    // Get entropy contract address
-    const entropyContractAddress = PYTH_ENTROPY_CONFIG.getEntropyContract(network);
+    // Get Somnia treasury contract address
+    const treasuryContractAddress = SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET].treasury;
+    
+    // Get entropy network (still on Arbitrum Sepolia)
+    const entropyNetwork = 'arbitrum-sepolia';
+    const entropyConfig = PYTH_ENTROPY_CONFIG.getNetworkConfig(entropyNetwork);
+    const entropyContractAddress = PYTH_ENTROPY_CONFIG.getEntropyContract(entropyNetwork);
     
     return NextResponse.json({
       success: true,
       treasury: {
         address: treasuryWallet.address,
-        balance: balanceInMon,
-        balanceWei: balance.toString()
+        contractAddress: treasuryContractAddress,
+        balance: balanceInSTT,
+        balanceWei: balance.toString(),
+        currency: 'STT'
       },
       network: {
-        name: networkConfig.name,
-        chainId: networkConfig.chainId,
-        rpcUrl: networkConfig.rpcUrl
+        name: somniaTestnetConfig.name,
+        chainId: somniaTestnetConfig.id,
+        rpcUrl: SOMNIA_RPC_URL,
+        explorer: somniaTestnetConfig.blockExplorers.default.url
       },
       entropy: {
+        network: entropyConfig.name,
+        chainId: entropyConfig.chainId,
         contractAddress: entropyContractAddress,
-        requiredFee: "0.001" // MON
+        requiredFee: "0.001" // ETH on Arbitrum Sepolia
       }
     });
     

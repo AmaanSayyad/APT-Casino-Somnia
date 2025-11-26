@@ -1,10 +1,13 @@
 import { ethers } from 'ethers';
 
-// Pyth Entropy V2 Contract Configuration for Monad Testnet
-const PYTH_ENTROPY_ADDRESS = '0x36825bf3fbdf5a29e2d5148bfe7dcf7b5639e320';
-const MONAD_TESTNET_RPC = 'https://testnet-rpc.monad.xyz';
+// Pyth Entropy V2 Contract Configuration for Arbitrum Sepolia
+// IMPORTANT: Entropy generation remains on Arbitrum Sepolia even though
+// game logging and deposits/withdrawals happen on Somnia Testnet
+const PYTH_ENTROPY_ADDRESS = process.env.NEXT_PUBLIC_PYTH_ENTROPY_CONTRACT || '0x549ebba8036ab746611b4ffa1423eb0a4df61440';
+const ARBITRUM_SEPOLIA_RPC = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
+const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
 
-// Minimal ABI for Pyth Entropy V2 on Monad
+// Minimal ABI for Pyth Entropy V2 on Arbitrum Sepolia
 const PYTH_ENTROPY_ABI = [
   // Core entrypoint used by consumer contracts
   "function requestWithCallback(address provider, bytes32 userCommitment) external payable returns (uint64)",
@@ -18,15 +21,23 @@ const PYTH_ENTROPY_ABI = [
 
 export async function POST(request) {
   try {
-    console.log('🎲 API: Generating Pyth Entropy...');
+    console.log('🎲 API: Generating Pyth Entropy on Arbitrum Sepolia...');
     
-    // Create provider
-    const provider = new ethers.JsonRpcProvider(MONAD_TESTNET_RPC);
+    // Create provider for Arbitrum Sepolia
+    const provider = new ethers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
+    
+    // Verify we're connected to Arbitrum Sepolia
+    const network = await provider.getNetwork();
+    console.log('🌐 Connected to network:', network.name, 'Chain ID:', network.chainId.toString());
+    
+    if (Number(network.chainId) !== ARBITRUM_SEPOLIA_CHAIN_ID) {
+      throw new Error(`Wrong network! Expected Arbitrum Sepolia (${ARBITRUM_SEPOLIA_CHAIN_ID}), got ${network.chainId}`);
+    }
     
     // Check if contract exists at this address
     const code = await provider.getCode(PYTH_ENTROPY_ADDRESS);
     if (code === '0x') {
-      throw new Error(`No contract found at address ${PYTH_ENTROPY_ADDRESS} on Monad Testnet`);
+      throw new Error(`No contract found at address ${PYTH_ENTROPY_ADDRESS} on Arbitrum Sepolia`);
     }
     console.log('✅ Contract exists at address:', PYTH_ENTROPY_ADDRESS);
     
@@ -39,15 +50,15 @@ export async function POST(request) {
     console.log('✅ Default provider:', defaultProvider);
     
     let fee = await contract.getFee(defaultProvider);
-    console.log('✅ Fee for provider:', ethers.formatEther(fee), 'MON');
+    console.log('✅ Fee for provider:', ethers.formatEther(fee), 'STT');
     
     // Let's try to call the contract with minimal data to see what happens
     console.log('🧪 Testing contract call with minimal parameters...');
     
-    // Check if we have a private key for signing (use Monad Testnet treasury)
-    const privateKey = process.env.MONAD_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY;
+    // Check if we have a private key for signing (use Arbitrum Sepolia treasury)
+    const privateKey = process.env.ARBITRUM_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY;
     if (!privateKey) {
-      throw new Error('MONAD_TREASURY_PRIVATE_KEY environment variable is required');
+      throw new Error('ARBITRUM_TREASURY_PRIVATE_KEY environment variable is required');
     }
     
     // Create wallet and signer
@@ -60,15 +71,15 @@ export async function POST(request) {
     
     // Request random value from Pyth Entropy
     console.log('🔄 Requesting random value from Pyth Entropy...');
-    console.log('💰 Using fee:', ethers.formatEther(fee), 'MON');
+    console.log('💰 Using fee:', ethers.formatEther(fee), 'STT');
     console.log('🏦 Wallet address:', wallet.address);
     
     // Check wallet balance first
     const balance = await provider.getBalance(wallet.address);
-    console.log('💳 Wallet balance:', ethers.formatEther(balance), 'MON');
+    console.log('💳 Wallet balance:', ethers.formatEther(balance), 'ETH');
     
     if (balance < fee) {
-      throw new Error(`Insufficient balance. Need ${ethers.formatEther(fee)} MON, have ${ethers.formatEther(balance)} MON. Please add more MON to treasury: ${wallet.address}`);
+      throw new Error(`Insufficient balance. Need ${ethers.formatEther(fee)} ETH, have ${ethers.formatEther(balance)} ETH. Please add more ETH to Arbitrum Sepolia treasury: ${wallet.address}`);
     }
     
     // Call the canonical V2 method
@@ -113,12 +124,12 @@ export async function POST(request) {
       blockNumber: receipt.blockNumber.toString(),
       // We cannot synchronously read randomness; return placeholder derived from tx for UI
       randomValue: generateRandomFromTxHash(tx.hash),
-      network: 'monad-testnet',
+      network: 'arbitrum-sepolia',
       // Use tx hash for entropy explorer search to ensure results
-      explorerUrl: `https://entropy-explorer.pyth.network/?chain=monad-testnet&search=${tx.hash}`,
-      monadExplorerUrl: `https://testnet.monadexplorer.com/tx/${tx.hash}`,
+      explorerUrl: `https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia&search=${tx.hash}`,
+      arbitrumSepoliaExplorerUrl: `https://sepolia.arbiscan.io/tx/${tx.hash}`,
       timestamp: Date.now(),
-      source: 'Pyth Entropy V1 (Monad Testnet)'
+      source: 'Pyth Entropy V2 (Arbitrum Sepolia)'
     };
     
     console.log('✅ API: Entropy generated successfully');

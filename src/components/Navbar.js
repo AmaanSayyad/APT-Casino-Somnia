@@ -19,7 +19,8 @@ import { useGlobalWalletPersistence } from '../hooks/useGlobalWalletPersistence'
 
 
 import { useNotification } from './NotificationSystem';
-import { TREASURY_CONFIG } from '../config/treasury';
+import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '../config/contracts';
+import { somniaTestnetConfig } from '../config/somniaTestnetConfig';
 // Enhanced UserBalanceSystem with deposit functionality
 const UserBalanceSystem = {
   getBalance: async (address) => {
@@ -89,8 +90,8 @@ const MOCK_SEARCH_RESULTS = {
     { id: 'game4', name: 'Plinko', path: '/game/plinko', type: 'Popular' },
   ],
   tournaments: [
-    { id: 'tournament1', name: 'High Roller Tournament', path: '/tournaments/high-roller', prize: '10,000 MON' },
-    { id: 'tournament2', name: 'Weekend Battle', path: '/tournaments/weekend-battle', prize: '5,000 MON' },
+    { id: 'tournament1', name: 'High Roller Tournament', path: '/tournaments/high-roller', prize: '10,000 STT' },
+    { id: 'tournament2', name: 'Weekend Battle', path: '/tournaments/weekend-battle', prize: '5,000 STT' },
   ],
   pages: [
     { id: 'page1', name: 'Bank', path: '/bank', description: 'Deposit and withdraw funds' },
@@ -180,7 +181,7 @@ export default function Navbar() {
     {
       id: '1',
       title: 'Balance Updated',
-      message: 'Your MON balance has been updated',
+      message: 'Your STT balance has been updated',
       isRead: false,
       time: '2 min ago'
     },
@@ -400,7 +401,7 @@ export default function Navbar() {
       const txHash = result?.transactionHash || 'Unknown';
       const txDisplay = txHash !== 'Unknown' ? `${txHash.slice(0, 8)}...` : 'Pending';
       
-      notification.success(`Withdrawal transaction sent! ${balanceInMon.toFixed(5)} MON will be transferred. TX: ${txDisplay}`);
+      notification.success(`Withdrawal transaction sent! ${balanceInMon.toFixed(5)} STT will be transferred. TX: ${txDisplay}`);
       
       // Close the modal
       setShowBalanceModal(false);
@@ -438,18 +439,21 @@ export default function Navbar() {
     }
     
     // Check deposit limits
-    if (amount < TREASURY_CONFIG.LIMITS.MIN_DEPOSIT) {
-      notification.error(`Minimum deposit amount is ${TREASURY_CONFIG.LIMITS.MIN_DEPOSIT} MON`);
+    const MIN_DEPOSIT = 0.001;
+    const MAX_DEPOSIT = 100;
+    
+    if (amount < MIN_DEPOSIT) {
+      notification.error(`Minimum deposit amount is ${MIN_DEPOSIT} STT`);
       return;
     }
     
-    if (amount > TREASURY_CONFIG.LIMITS.MAX_DEPOSIT) {
-      notification.error(`Maximum deposit amount is ${TREASURY_CONFIG.LIMITS.MAX_DEPOSIT} MON`);
+    if (amount > MAX_DEPOSIT) {
+      notification.error(`Maximum deposit amount is ${MAX_DEPOSIT} STT`);
       return;
     }
 
     setIsDepositing(true);
-    console.log('🚀 Starting deposit process for:', amount, 'MON');
+    console.log('🚀 Starting deposit process for:', amount, 'STT');
     try {
       console.log('Depositing to house balance:', { address: address, amount });
       
@@ -462,66 +466,62 @@ export default function Navbar() {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const userAccount = accounts[0];
       
-      // Check if user is on Monad Testnet network
+      // Check if user is on Somnia Testnet network
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      const expectedChainId = TREASURY_CONFIG.NETWORK.CHAIN_ID;
+      const expectedChainId = '0x' + somniaTestnetConfig.id.toString(16); // Convert to hex
       
       console.log('🔍 Current chain ID:', chainId);
       console.log('🔍 Expected chain ID:', expectedChainId);
       
       if (chainId !== expectedChainId) {
         console.log('🔄 Need to switch network...');
-        // Try to switch to Monad Testnet
+        // Try to switch to Somnia Testnet
         try {
-          console.log('🔄 Attempting to switch to Monad Testnet...');
+          console.log('🔄 Attempting to switch to Somnia Testnet...');
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: expectedChainId }],
           });
-          console.log('✅ Successfully switched to Monad Testnet');
+          console.log('✅ Successfully switched to Somnia Testnet');
         } catch (switchError) {
           console.log('⚠️ Switch error:', switchError);
-          // If Monad Testnet is not added, add it
+          // If Somnia Testnet is not added, add it
           if (switchError.code === 4902) {
-            console.log('🔧 Network not found, adding Monad Testnet...');
+            console.log('🔧 Network not found, adding Somnia Testnet...');
             try {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params: [{
                   chainId: expectedChainId,
-                  chainName: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
-                  nativeCurrency: {
-                    name: 'MON',
-                    symbol: 'MON',
-                    decimals: 18
-                  },
-                  rpcUrls: [TREASURY_CONFIG.NETWORK.RPC_URL],
-                  blockExplorerUrls: [TREASURY_CONFIG.NETWORK.EXPLORER_URL]
+                  chainName: somniaTestnetConfig.name,
+                  nativeCurrency: somniaTestnetConfig.nativeCurrency,
+                  rpcUrls: [somniaTestnetConfig.rpcUrls.default.http[0]],
+                  blockExplorerUrls: [somniaTestnetConfig.blockExplorers.default.url]
                 }]
               });
-              console.log('✅ Successfully added Monad Testnet network');
+              console.log('✅ Successfully added Somnia Testnet network');
               
               // Try to switch again after adding
               await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: expectedChainId }],
               });
-              console.log('✅ Successfully switched to Monad Testnet after adding');
+              console.log('✅ Successfully switched to Somnia Testnet after adding');
             } catch (addError) {
               console.error('❌ Failed to add network:', addError);
-              throw new Error(`Failed to add Monad Testnet network: ${addError.message}`);
+              throw new Error(`Failed to add Somnia Testnet network: ${addError.message}`);
             }
           } else {
             console.error('❌ Switch error:', switchError);
-            throw new Error(`Please switch to ${TREASURY_CONFIG.NETWORK.CHAIN_NAME} network. Error: ${switchError.message}`);
+            throw new Error(`Please switch to ${somniaTestnetConfig.name} network. Error: ${switchError.message}`);
           }
         }
       } else {
         console.log('✅ Already on correct network');
       }
       
-      // Casino treasury address from config
-      const TREASURY_ADDRESS = TREASURY_CONFIG.ADDRESS;
+      // Casino treasury address from Somnia contracts config
+      const TREASURY_ADDRESS = SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET].treasury;
       
       // Convert amount to Wei (18 decimals)
       const amountWei = (amount * 10**18).toString();
@@ -531,7 +531,7 @@ export default function Navbar() {
         to: TREASURY_ADDRESS,
         from: userAccount,
         value: '0x' + parseInt(amountWei).toString(16), // Convert to hex
-        gas: TREASURY_CONFIG.GAS.DEPOSIT_LIMIT, // Gas limit from config
+        gas: '0x5208', // 21000 gas for simple ETH transfer
       };
       
       console.log('Sending transaction to MetaMask:', transactionParameters);
@@ -575,7 +575,7 @@ export default function Navbar() {
         // Don't fail the deposit if API call fails - balance is already updated
       }
       
-      notification.success(`Successfully deposited ${amount} MON to casino treasury! TX: ${txHash.slice(0, 10)}...`);
+      notification.success(`Successfully deposited ${amount} STT to casino treasury! TX: ${txHash.slice(0, 10)}...`);
       
       setDepositAmount("");
       

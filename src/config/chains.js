@@ -5,32 +5,37 @@
 
 import { defineChain } from 'viem';
 
-// Monad Testnet Chain Definition
-export const monadTestnet = defineChain({
-  id: 10143,
-  name: 'Monad Testnet',
+// Somnia Testnet Chain Definition
+// Configuration based on official network.md documentation
+export const somniaTestnet = defineChain({
+  id: 50312, // Correct chain ID from network.md
+  name: 'Somnia Testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'Monad',
-    symbol: 'MON',
+    name: 'STT',
+    symbol: 'STT',
   },
   rpcUrls: {
     default: {
-      http: ['https://testnet-rpc.monad.xyz'],
+      http: ['https://dream-rpc.somnia.network'], // Primary RPC from network.md
     },
     public: {
-      http: ['https://testnet-rpc.monad.xyz'],
+      http: ['https://dream-rpc.somnia.network'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Monad Testnet Explorer',
-      url: 'https://testnet.monadexplorer.com',
+      name: 'Somnia Shannon Explorer',
+      url: 'https://shannon-explorer.somnia.network', // Primary explorer from network.md
+    },
+    socialscan: {
+      name: 'Somnia Testnet SocialScan',
+      url: 'https://somnia-testnet.socialscan.io', // Alternative explorer
     },
   },
   testnet: true,
 });
 
 export default {
-  monadTestnet,
+  somniaTestnet,
 };

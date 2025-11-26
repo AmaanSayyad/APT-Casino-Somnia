@@ -127,7 +127,7 @@ export default function FeatureSection() {
               </div>
               
               <p className="text-white/80 text-sm">
-                APT-Casino leverages Monad Network Blockchain to provide a transparent, provably fair gaming
+                APT-Casino leverages Somnia Testnet Network Blockchain to provide a transparent, provably fair gaming
                 experience with DeFi integration, allowing players to earn passive income through staking.
               </p>
             </div>

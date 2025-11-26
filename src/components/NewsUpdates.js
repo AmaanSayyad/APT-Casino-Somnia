@@ -7,8 +7,8 @@ const NewsUpdates = () => {
   const newsItems = [
     {
       id: 1,
-      title: 'New Token Bridge Partnership with Monad Network',
-      excerpt: 'APT Casino partners with Monad Network to provide seamless cross-chain token transfers with lower fees.',
+      title: 'New Token Bridge Partnership with Somnia Testnet Network',
+      excerpt: 'APT Casino partners with Somnia Testnet Network to provide seamless cross-chain token transfers with lower fees.',
       date: '2025-05-08',
       category: 'Partnership',
       image: '/images/news/partnership.png',

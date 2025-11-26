@@ -1,6 +1,6 @@
-# APT Casino - Monad Testnet
+# APT Casino - Somnia Testnet
 
-A decentralized casino platform built on Monad Testnet with Pyth Entropy for provably fair gaming and MetaMask Smart Accounts integration.
+A decentralized casino platform built on Somnia Testnet with Pyth Entropy for provably fair gaming and MetaMask Smart Accounts integration.
 
 ## 🎮 The Story Behind APT Casino
 
@@ -35,7 +35,7 @@ APT Casino addresses these problems by offering:
 
 - **Multiple Games**: Wheel, Roulette, Plinko, and Mines with verifiable outcomes
 - **MetaMask Smart Accounts**: Enhanced wallet experience with batch transactions
-- **MON Token**: Native currency for Monad Testnet
+- **MON Token**: Native currency for Somnia Testnet
 - **Flexible Withdrawal**: Unrestricted access to funds
 - **Transparent Bonuses**: Clear terms without hidden traps
 - **True Asset Ownership**: Decentralized asset management
@@ -61,7 +61,7 @@ APT Casino addresses these problems by offering:
 
 ### 3. Multi-Chain Architecture
 
-- **Gaming Network**: Monad Testnet (Chain ID: 10143)
+- **Gaming Network**: Somnia Testnet (Chain ID: 10143)
 - **Entropy Network**: Arbitrum Sepolia (Chain ID: 421614)
 
 ### 4. Game Selection
@@ -86,19 +86,19 @@ APT Casino addresses these problems by offering:
 
 ## 🚀 Getting Started
 
-1. **Connect Wallet**: Connect your MetaMask wallet to Monad Testnet
-2. **Get Tokens**: Get MON tokens from the Monad testnet faucet
+1. **Connect Wallet**: Connect your MetaMask wallet to Somnia Testnet
+2. **Get Tokens**: Get MON tokens from the Somnia Testnet faucet
 3. **Deposit**: Deposit MON to your house balance
 4. **Play**: Start playing provably fair games!
 
 ### Network Configuration
 
-Add Monad Testnet to MetaMask:
-- **Network Name**: Monad Testnet
-- **RPC URL**: `https://testnet-rpc.monad.xyz`
+Add Somnia Testnet to MetaMask:
+- **Network Name**: Somnia Testnet
+- **RPC URL**: `https://dream-rpc.somnia.network`
 - **Chain ID**: `10143`
 - **Currency Symbol**: `MON`
-- **Block Explorer**: `https://testnet.monadexplorer.com`
+- **Block Explorer**: `https://shannon-explorer.somnia.network`
 
 ## 🔷 Smart Account Features
 
@@ -167,8 +167,8 @@ graph TB
         I --> LP[Livepeer API]
     end
     
-    subgraph Gaming["Gaming Network - Monad Testnet"]
-        MT[Monad Testnet] --> MON[MON Token]
+    subgraph Gaming["Gaming Network - Somnia Testnet"]
+        MT[Somnia Testnet] --> MON[MON Token]
         MT --> DEP[Deposits/Withdrawals]
         MT --> SA_BATCH[Batch Transactions]
         MT --> GAS[Gasless Transactions]
@@ -231,8 +231,8 @@ flowchart TD
     I --> K
     
     K --> L{Network Check}
-    L -->|Monad Testnet| M[Connection Success]
-    L -->|Wrong Network| N[Switch to Monad Testnet]
+    L -->|Somnia Testnet| M[Connection Success]
+    L -->|Wrong Network| N[Switch to Somnia Testnet]
     
     N --> O{User Approves?}
     O -->|Yes| M
@@ -294,7 +294,7 @@ graph TB
     end
 ```
 
-## 🌐 Multi-Network Architecture (Monad + Arbitrum)
+## 🌐 Multi-Network Architecture (Somnia Testnet + Arbitrum)
 
 ```mermaid
 graph TB
@@ -309,8 +309,8 @@ graph TB
         NS --> GM[Game Manager]
     end
     
-    subgraph MonadNet["Monad Testnet (Chain ID: 10143)"]
-        MT[Monad Testnet] --> MON[MON Token]
+    subgraph Somnia TestnetNet["Somnia Testnet (Chain ID: 10143)"]
+        MT[Somnia Testnet] --> MON[MON Token]
         MON --> DEP[Deposit Contract]
         MON --> WITH[Withdraw Contract]
         DEP --> TB[Treasury Balance]
@@ -382,7 +382,7 @@ sequenceDiagram
     participant U as User
     participant SA as Smart Account
     participant UI as Game UI
-    participant MT as Monad Testnet
+    participant MT as Somnia Testnet
     participant API as API Route
     participant SC as Smart Contract (Arbitrum)
     participant PE as Pyth Entropy
@@ -483,7 +483,7 @@ sequenceDiagram
     participant U as User
     participant UI as Casino UI
     participant SA as Smart Account
-    participant MT as Monad Testnet
+    participant MT as Somnia Testnet
     participant AS as Arbitrum Sepolia
     participant PE as Pyth Entropy
     
@@ -492,7 +492,7 @@ sequenceDiagram
     U->>UI: Select Multiple Games
     UI->>SA: Prepare Batch Transaction
     
-    Note over SA,MT: Batch Transaction on Monad
+    Note over SA,MT: Batch Transaction on Somnia Testnet
     SA->>MT: Batch Bet Transaction
     MT->>SA: Confirm All Bets
     
@@ -502,7 +502,7 @@ sequenceDiagram
     PE->>AS: Return Entropy Proofs
     AS->>UI: All Game Results
     
-    Note over SA,MT: Batch Payout on Monad
+    Note over SA,MT: Batch Payout on Somnia Testnet
     UI->>SA: Process Batch Payouts
     SA->>MT: Batch Payout Transaction
     MT->>SA: Confirm All Payouts
@@ -554,5 +554,5 @@ flowchart TD
 
 ## 🔗 Links
 
-- **Live Demo**: [https://apt-casino-monad.vercel.app](https://apt-casino-monad.vercel.app)
-- **Pitch Deck**: [https://www.figma.com/deck/VKHErF5fQr9JVOvjn9VWg3/APT-Casino-Monad?node-id=1-1812&p=f&t=ayEzRDoZZrC2bNfR-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1](https://www.figma.com/deck/VKHErF5fQr9JVOvjn9VWg3/APT-Casino-Monad?node-id=1-1812&p=f&t=ayEzRDoZZrC2bNfR-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1)
+- **Live Demo**: [https://apt-casino-somnia-testnet.vercel.app](https://apt-casino-somnia-testnet.vercel.app)
+- **Pitch Deck**: [https://www.figma.com/deck/VKHErF5fQr9JVOvjn9VWg3/APT-Casino-Somnia Testnet?node-id=1-1812&p=f&t=ayEzRDoZZrC2bNfR-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1](https://www.figma.com/deck/VKHErF5fQr9JVOvjn9VWg3/APT-Casino-Somnia Testnet?node-id=1-1812&p=f&t=ayEzRDoZZrC2bNfR-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1)

@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 // Mock data for Ethereum testnet
 const MOCK_BALANCES = {
   native: {
-    symbol: 'MON',
+    symbol: 'STT',
     formatted: '25.1234',
     value: '25123400000000000000000',
     decimals: 18
   },
   eth: {
-    symbol: 'MON',
+    symbol: 'STT',
     formatted: '500.00',
     value: '500000000000000000000000',
     decimals: 18

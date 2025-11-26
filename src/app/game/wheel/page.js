@@ -20,6 +20,7 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 // import VRFProofRequiredModal from '@/components/VRF/VRFProofRequiredModal';
 // import vrfLogger from '@/services/VRFLoggingService';
 import pythEntropyService from '@/services/PythEntropyService';
+import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
 
 // Import new components
 import WheelVideo from "./components/WheelVideo";
@@ -53,6 +54,9 @@ export default function Home() {
   const { userBalance, isLoading: isLoadingBalance } = useSelector((state) => state.balance);
   const notification = useNotification();
   const { isConnected } = useWalletStatus();
+  
+  // Somnia Game Logger
+  const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
   
   // Use ref to prevent infinite loop in useEffect
   const isInitialized = useRef(false);
@@ -94,7 +98,7 @@ export default function Home() {
     }
 
     // Generate Pyth Entropy in background for provably fair proof
-  const generateEntropyInBackground = async (historyItemId) => {
+  const generateEntropyInBackground = async (historyItemId, winAmount, actualMultiplier) => {
     try {
       console.log('🔮 PYTH ENTROPY: Generating background entropy for Wheel game...');
       
@@ -117,7 +121,7 @@ export default function Home() {
                 randomValue: entropyResult.randomValue,
                 randomNumber: entropyResult.randomValue,
                 transactionHash: entropyResult.entropyProof?.transactionHash,
-                monadExplorerUrl: entropyResult.entropyProof?.monadExplorerUrl,
+                arbiscanUrl: entropyResult.entropyProof?.arbiscanUrl,
                 explorerUrl: entropyResult.entropyProof?.explorerUrl,
                 timestamp: entropyResult.entropyProof?.timestamp,
                 source: 'Pyth Entropy'
@@ -125,6 +129,34 @@ export default function Home() {
             }
           : item
       ));
+      
+      // Log game result to Somnia Testnet (non-blocking)
+      logGame({
+        gameType: 'WHEEL',
+        betAmount: betAmount.toString(),
+        result: {
+          winningSegment: historyItemId,
+          multiplier: actualMultiplier,
+          color: detectedColor
+        },
+        payout: winAmount.toString(),
+        entropyProof: {
+          requestId: entropyResult.entropyProof.requestId,
+          transactionHash: entropyResult.entropyProof.transactionHash
+        }
+      }).then(txHash => {
+        if (txHash) {
+          console.log('✅ Wheel game logged to Somnia:', getExplorerUrl(txHash));
+          // Update game history with Somnia transaction hash
+          setGameHistory(prev => prev.map(item => 
+            item.id === historyItemId 
+              ? { ...item, somniaTxHash: txHash }
+              : item
+          ));
+        }
+      }).catch(error => {
+        console.warn('⚠️ Failed to log Wheel game to Somnia:', error);
+      });
       
       // Log on-chain via casino wallet (non-blocking)
       try {
@@ -224,8 +256,8 @@ export default function Home() {
             randomValue: Math.floor(Math.random() * 1000000),
             randomNumber: Math.floor(Math.random() * 1000000),
             transactionHash: 'generating...',
-            monadExplorerUrl: 'https://testnet.monadexplorer.com/',
-            explorerUrl: 'https://entropy-explorer.pyth.network/?chain=monad-testnet',
+            arbiscanUrl: 'https://sepolia.arbiscan.io/',
+            explorerUrl: 'https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia',
             timestamp: Date.now(),
             source: 'Generating...'
           };
@@ -255,7 +287,7 @@ export default function Home() {
           }
 
           // Generate Pyth Entropy in background for provably fair proof
-          generateEntropyInBackground(newHistoryItem.id).catch(error => {
+          generateEntropyInBackground(newHistoryItem.id, winAmount, actualMultiplier).catch(error => {
             console.error('❌ Background entropy generation failed:', error);
           });
           

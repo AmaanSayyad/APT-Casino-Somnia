@@ -27,8 +27,8 @@ export default function Footer() {
   ];
   
   const paymentMethods = [
-    { name: "MON", icon: "/icons/eth.svg" },
-    { name: "MON", icon: "/icons/apt.svg" },
+    { name: "STT", icon: "/icons/eth.svg" },
+    { name: "STT", icon: "/icons/apt.svg" },
   ];
   
   const handleSubscribe = (e) => {
@@ -66,8 +66,8 @@ export default function Footer() {
           <div className="p-[1px] bg-gradient-to-r from-red-magic/40 to-blue-magic/40 rounded-lg mb-6 hover:from-red-magic hover:to-blue-magic transition-all duration-300">
             <div className="bg-[#120010] rounded-lg p-4">
               <p className="text-white/80 text-sm leading-relaxed">
-                APT-Casino is your ultimate destination for Monad Network gaming. Experience transparency, fairness,
-                and excitement powered by Monad Network blockchain technology.
+                APT-Casino is your ultimate destination for Somnia Testnet Network gaming. Experience transparency, fairness,
+                and excitement powered by Somnia Testnet Network blockchain technology.
               </p>
             </div>
           </div>

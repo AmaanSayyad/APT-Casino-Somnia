@@ -4,15 +4,15 @@ import { Box, Typography, Paper, Chip, IconButton, Tooltip } from '@mui/material
 import { OpenInNew, Verified, Security } from '@mui/icons-material';
 
 const BettingHistory = ({ history }) => {
-  const openMonadExplorer = (txHash) => {
+  const openSomnia TestnetExplorer = (txHash) => {
     if (txHash) {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'monad-testnet';
+      const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
       let explorerUrl;
       
-      if (network === 'monad-testnet') {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${txHash}`;
+      if (network === 'somnia-testnet-testnet') {
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
       } else {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${txHash}`;
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
       }
       
       window.open(explorerUrl, '_blank');
@@ -115,7 +115,7 @@ const BettingHistory = ({ history }) => {
                         transform: bet.vrfDetails?.transactionHash ? 'scale(1.1)' : 'none'
                       }
                     }}
-                    onClick={() => bet.vrfDetails?.transactionHash && openMonadExplorer(bet.vrfDetails.transactionHash)}
+                    onClick={() => bet.vrfDetails?.transactionHash && openSomnia TestnetExplorer(bet.vrfDetails.transactionHash)}
                   >
                     {bet.roll}
                     {bet.vrfDetails?.transactionHash && (
@@ -146,14 +146,14 @@ const BettingHistory = ({ history }) => {
                   <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
                     VRF:
                   </Typography>
-                  <Tooltip title="Click to verify on Monad Explorer">
+                  <Tooltip title="Click to verify on Somnia Testnet Explorer">
                     <Chip
                       label={formatTxHash(bet.vrfDetails.transactionHash)}
                       size="small"
                       variant="outlined"
                       color="success"
                       icon={<Verified />}
-                      onClick={() => openMonadExplorer(bet.vrfDetails.transactionHash)}
+                      onClick={() => openSomnia TestnetExplorer(bet.vrfDetails.transactionHash)}
                       sx={{ 
                         fontSize: '0.6rem', 
                         height: 20,

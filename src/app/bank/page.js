@@ -12,8 +12,8 @@ import { FaChartLine, FaHistory, FaInfoCircle, FaExchangeAlt, FaCoins, FaWallet,
 const BORROW_ASSETS = {
   ethereum_testnet: [
     {
-      symbol: "MON",
-      name: "Monad Network Coin",
+      symbol: "STT",
+      name: "Somnia Testnet Network Coin",
       iconColor: "#F1324D",
       address: null // Native token
     }
@@ -22,9 +22,9 @@ const BORROW_ASSETS = {
 
 // Mock transaction history
 const MOCK_TRANSACTIONS = [
-  { type: 'deposit', token: 'MON', amount: '120.5', date: new Date(Date.now() - 86400000 * 2), status: 'completed' },
+  { type: 'deposit', token: 'STT', amount: '120.5', date: new Date(Date.now() - 86400000 * 2), status: 'completed' },
   { type: 'borrow', token: 'MNT', amount: '0.3', date: new Date(Date.now() - 86400000), status: 'completed' },
-  { type: 'swap', tokenFrom: 'MNT', tokenTo: 'MON', amountFrom: '0.2', amountTo: '98.32', date: new Date(), status: 'completed' }
+  { type: 'swap', tokenFrom: 'MNT', tokenTo: 'STT', amountFrom: '0.2', amountTo: '98.32', date: new Date(), status: 'completed' }
 ];
 
 export default function Bank() {
@@ -66,8 +66,8 @@ export default function Bank() {
       setChainId('ethereum_testnet'); // Ethereum testnet for development
       setAssets([
         {
-          symbol: "MON",
-          name: "Monad Network Coin",
+          symbol: "STT",
+          name: "Somnia Testnet Network Coin",
           iconColor: "#F1324D",
           address: "0x...",
           apr: "12.5%",
@@ -84,8 +84,8 @@ export default function Bank() {
           available: "$320,000"
         },
         {
-          symbol: "MON",
-          name: 'MON',
+          symbol: "STT",
+          name: 'STT',
           iconColor: "#2196F3",
           address: null,
           apr: "4.8%",
@@ -110,8 +110,8 @@ export default function Bank() {
         // Set mock lending market data for Ethereum testnet
         setAssets([
           {
-            symbol: "MON",
-            name: "Monad Network Coin",
+            symbol: "STT",
+            name: "Somnia Testnet Network Coin",
             iconColor: "#F1324D",
             address: "0x...",
             apr: "12.5%",
@@ -190,7 +190,7 @@ export default function Bank() {
         {showNetworkBanner && (
           <div className="bg-gradient-to-r from-red-magic/80 to-blue-magic/80 py-2 px-4 text-center relative mb-8 rounded-lg">
             <p className="text-white text-sm">
-              Connected to Monad Network Testnet. 
+              Connected to Somnia Testnet Network Testnet. 
               <button className="underline ml-2">Switch Network</button>
             </p>
             <button 
@@ -247,8 +247,8 @@ export default function Bank() {
                 <div className="bg-gradient-to-r p-[1px] from-red-magic to-blue-magic rounded-xl">
                   {/* Ethereum Testnet Only - No Uniswap Integration */}
         <div className="bg-gray-800 rounded-lg p-6 text-center">
-          <h3 className="text-xl font-semibold text-white mb-2">Monad Network Testnet Only</h3>
-          <p className="text-gray-400">This application works exclusively with Monad Network Testnet</p>
+          <h3 className="text-xl font-semibold text-white mb-2">Somnia Testnet Network Testnet Only</h3>
+          <p className="text-gray-400">This application works exclusively with Somnia Testnet Network Testnet</p>
         </div>
                 </div>
               </div>

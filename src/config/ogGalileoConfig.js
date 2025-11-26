@@ -1,45 +1,45 @@
 /**
- * Monad Testnet Testnet Configuration
- * Configuration for Monad Testnet testnet with MON token
+ * Somnia Testnet Testnet Configuration
+ * Configuration for Somnia Testnet testnet with MON token
  */
 
-// Monad Testnet Chain Configuration
-export const MONAD_TESTNET_CONFIG = {
+// Somnia Testnet Chain Configuration
+export const SOMNIA_TESTNET_TESTNET_CONFIG = {
   chainId: 16602,
-  name: 'monad-testnet-Testnet',
-  network: 'monad-testnet-testnet',
+  name: 'somnia-testnet-testnet-Testnet',
+  network: 'somnia-testnet-testnet-testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'MON',
-    symbol: 'MON',
+    name: 'STT',
+    symbol: 'STT',
   },
   rpcUrls: {
     default: {
       http: [
-        process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://testnet-rpc.monad.xyz',
+        process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://dream-rpc.somnia.network',
         process.env.NEXT_PUBLIC_0G_GALILEO_RPC_FALLBACK || 'https://evm-rpc-galileo.0g.ai'
       ],
     },
     public: {
       http: [
-        'https://testnet-rpc.monad.xyz',
+        'https://dream-rpc.somnia.network',
         'https://evm-rpc-galileo.0g.ai'
       ],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Monad Testnet Explorer',
-      url: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://testnet.monadexplorer.com',
+      name: 'Somnia Testnet Explorer',
+      url: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://shannon-explorer.somnia.network',
     },
   },
   testnet: true,
 };
 
-// Monad Testnet Tokens
-export const MONAD_TESTNET_TOKENS = {
+// Somnia Testnet Tokens
+export const SOMNIA_TESTNET_TESTNET_TOKENS = {
   MON: {
-    symbol: 'MON',
+    symbol: 'STT',
     name: 'MON token',
     decimals: 18,
     address: '0x0000000000000000000000000000000000000000',
@@ -49,8 +49,8 @@ export const MONAD_TESTNET_TOKENS = {
   }
 };
 
-// Casino configuration for Monad Testnet
-export const MONAD_TESTNET_CASINO_CONFIG = {
+// Casino configuration for Somnia Testnet
+export const SOMNIA_TESTNET_TESTNET_CASINO_CONFIG = {
   // Deposit/Withdraw settings
   minDeposit: '0.001', // 0.001 MON
   maxDeposit: '100',   // 100 MON
@@ -86,14 +86,14 @@ export const MONAD_TESTNET_CASINO_CONFIG = {
   }
 };
 
-// Network switching helper for Monad Testnet
+// Network switching helper for Somnia Testnet
 export const switchToOGGalileo = async () => {
   if (typeof window === 'undefined' || !window.ethereum) {
     throw new Error('MetaMask not found');
   }
 
   try {
-    // Try to switch to Monad Testnet
+    // Try to switch to Somnia Testnet
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: '0x40da' }], // 16602 in hex
@@ -105,14 +105,14 @@ export const switchToOGGalileo = async () => {
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: '0x40da',
-          chainName: 'monad-testnet-Testnet',
+          chainName: 'somnia-testnet-testnet-Testnet',
           nativeCurrency: {
-            name: 'MON',
-            symbol: 'MON',
+            name: 'STT',
+            symbol: 'STT',
             decimals: 18,
           },
-          rpcUrls: ['https://testnet-rpc.monad.xyz'],
-          blockExplorerUrls: ['https://testnet.monadexplorer.com'],
+          rpcUrls: ['https://dream-rpc.somnia.network'],
+          blockExplorerUrls: ['https://shannon-explorer.somnia.network'],
         }],
       });
     } else {
@@ -121,4 +121,4 @@ export const switchToOGGalileo = async () => {
   }
 };
 
-export default MONAD_TESTNET_CONFIG;
+export default SOMNIA_TESTNET_TESTNET_CONFIG;

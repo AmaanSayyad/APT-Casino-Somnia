@@ -12,16 +12,16 @@ const WheelHistory = ({ gameHistory = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
 
-   // Open Monad Explorer link for transaction hash
-   const openMonadExplorer = (hash) => {
+   // Open Somnia Testnet Explorer link for transaction hash
+   const openSomnia TestnetExplorer = (hash) => {
     if (hash && hash !== 'unknown') {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'monad-testnet';
+      const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
       let explorerUrl;
       
-      if (network === 'monad-testnet') {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${hash}`;
+      if (network === 'somnia-testnet-testnet') {
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       } else {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${hash}`;
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       }
       
       window.open(explorerUrl, '_blank');
@@ -595,7 +595,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           <Button
                             onClick={() => {
                               if (item.entropyProof.transactionHash) {
-                                window.open(`https://entropy-explorer.pyth.network/?chain=monad-testnet&search=${item.entropyProof.transactionHash}`, '_blank');
+                                window.open(`https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${item.entropyProof.transactionHash}`, '_blank');
                               }
                             }}
                             size="small"
@@ -616,7 +616,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           <Button
                             onClick={() => {
                               if (item.entropyProof?.transactionHash) {
-                                window.open(`https://testnet.monadexplorer.com/tx/${item.entropyProof.transactionHash}`, '_blank');
+                                window.open(`https://shannon-explorer.somnia.network/tx/${item.entropyProof.transactionHash}`, '_blank');
                               }
                             }}
                             size="small"
@@ -632,7 +632,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                               }
                             }}
                           >
-                            Monad
+                            Somnia Testnet
                           </Button>
                         </Box>
                         <Typography variant="caption" color="rgba(255,255,255,0.5)">

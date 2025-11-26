@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
-import { switchToMonadTestnet, isMonadTestnet, MONAD_TESTNET_CONFIG } from '@/utils/networkUtils';
+import { switchToSomnia TestnetTestnet, isSomnia TestnetTestnet, SOMNIA_TESTNET_TESTNET_CONFIG } from '@/utils/networkUtils';
 
 const NetworkSwitcher = () => {
   const { isConnected } = useAccount();
@@ -13,7 +13,7 @@ const NetworkSwitcher = () => {
 
   useEffect(() => {
     if (isConnected && chainId) {
-      setIsWrongNetwork(!isMonadTestnet(chainId));
+      setIsWrongNetwork(!isSomnia TestnetTestnet(chainId));
     }
   }, [isConnected, chainId]);
 
@@ -25,19 +25,19 @@ const NetworkSwitcher = () => {
       // First try using wagmi's switchChain
       if (switchChain) {
         try {
-          await switchChain({ chainId: 10143 });
+          await switchChain({ chainId: 50312 });
         } catch (wagmiError) {
           console.log('Wagmi switch failed, trying manual method:', wagmiError);
           // If wagmi fails, try manual MetaMask method
-          await switchToMonadTestnet();
+          await switchToSomnia TestnetTestnet();
         }
       } else {
         // Fallback to manual method
-        await switchToMonadTestnet();
+        await switchToSomnia TestnetTestnet();
       }
     } catch (error) {
       console.error('Failed to switch network:', error);
-      alert('Failed to switch to Monad Testnet. Please add it manually in MetaMask.');
+      alert('Failed to switch to Somnia Testnet. Please add it manually in MetaMask.');
     } finally {
       setIsSwitching(false);
     }
@@ -53,7 +53,7 @@ const NetworkSwitcher = () => {
         <div className="flex items-center space-x-4">
           <div className="flex-1">
             <p className="font-medium">Wrong Network</p>
-            <p className="text-sm text-red-200">Please switch to Monad Testnet to use this app</p>
+            <p className="text-sm text-red-200">Please switch to Somnia Testnet to use this app</p>
           </div>
           <button
             onClick={handleSwitchNetwork}

@@ -98,7 +98,7 @@ const BorrowCard = ({ asset }) => {
   
   function calculateMaxBorrowable() {
     if (isDev) {
-      return asset.symbol === 'MON' 
+      return asset.symbol === 'STT' 
         ? 0.5123 
         : Math.random() * 2 + 0.05;
     }

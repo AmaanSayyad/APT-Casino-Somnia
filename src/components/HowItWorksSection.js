@@ -30,7 +30,7 @@ const HowItWorksSection = () => {
     {
       id: 2,
       title: 'Get MON tokens',
-      description: 'Power your gameplay with MON tokens of Monad Network.',
+      description: 'Power your gameplay with MON tokens of Somnia Testnet Network.',
       emoji: '💰'
     },
     {

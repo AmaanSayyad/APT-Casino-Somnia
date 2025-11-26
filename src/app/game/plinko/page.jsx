@@ -14,6 +14,7 @@ import { Typography } from "@mui/material";
 import { GiRollingDices, GiCardRandom, GiPokerHand } from "react-icons/gi";
 import { FaPercentage, FaBalanceScale, FaChartLine, FaCoins, FaTrophy, FaPlay, FaExternalLinkAlt } from "react-icons/fa";
 import pythEntropyService from '../../../services/PythEntropyService';
+import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
 
 export default function Plinko() {
   const userBalance = useSelector((state) => state.balance.userBalance);
@@ -25,6 +26,9 @@ export default function Plinko() {
   const [showMobileWarning, setShowMobileWarning] = useState(false);
 
   const plinkoGameRef = useRef(null);
+  
+  // Somnia Game Logger
+  const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
 
   // Smooth scroll helper
   const scrollToElement = (elementId) => {
@@ -214,6 +218,8 @@ export default function Plinko() {
           sequenceNumber: randomData.entropyProof?.sequenceNumber,
           randomValue: randomData.randomValue,
           transactionHash: randomData.entropyProof?.transactionHash,
+          arbiscanUrl: randomData.entropyProof?.arbiscanUrl,
+          explorerUrl: randomData.entropyProof?.explorerUrl,
           timestamp: randomData.entropyProof?.timestamp
         },
         timestamp: new Date().toISOString()
@@ -222,10 +228,40 @@ export default function Plinko() {
       console.log('📝 Enhanced bet result:', enhancedBetResult);
       setGameHistory(prev => [enhancedBetResult, ...prev].slice(0, 100)); // Keep up to last 100 entries
       
-    } catch (error) {
-      console.error('❌ Error using Yellow Network for Plinko game:', error);
+      // Log game result to Somnia Testnet (non-blocking)
+      logGame({
+        gameType: 'PLINKO',
+        betAmount: (newBetResult.betAmount || 0).toString(),
+        result: {
+          path: newBetResult.path || [],
+          finalBucket: newBetResult.bucket || 0,
+          multiplier: newBetResult.multiplier || 0
+        },
+        payout: (newBetResult.payout || 0).toString(),
+        entropyProof: {
+          requestId: randomData.entropyProof.requestId,
+          transactionHash: randomData.entropyProof.transactionHash
+        }
+      }).then(txHash => {
+        if (txHash) {
+          console.log('✅ Plinko game logged to Somnia:', getExplorerUrl(txHash));
+          // Update game history with Somnia transaction hash
+          setGameHistory(prev => {
+            const updatedHistory = [...prev];
+            if (updatedHistory.length > 0) {
+              updatedHistory[0] = { ...updatedHistory[0], somniaTxHash: txHash };
+            }
+            return updatedHistory;
+          });
+        }
+      }).catch(error => {
+        console.warn('⚠️ Failed to log Plinko game to Somnia:', error);
+      });
       
-      // Still add the bet result even if Yellow Network fails
+    } catch (error) {
+      console.error('❌ Error using Pyth Entropy for Plinko game:', error);
+      
+      // Still add the bet result even if Pyth Entropy fails
       setGameHistory(prev => [newBetResult, ...prev].slice(0, 100));
     }
   };

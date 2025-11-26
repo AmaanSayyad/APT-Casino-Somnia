@@ -146,8 +146,8 @@ class PythEntropyService {
         gameConfig: gameConfig,
         metadata: {
           source: 'Pyth Entropy (API)',
-          network: 'monad-testnet',
-          algorithm: 'pyth-entropy-hardhat',
+          network: 'arbitrum-sepolia',
+          algorithm: 'pyth-entropy-v2',
           generatedAt: new Date().toISOString()
         }
       };
@@ -173,9 +173,9 @@ class PythEntropyService {
           transactionHash: 'fallback_no_tx',
           blockNumber: null,
           randomValue: Math.floor(Math.random() * 1000000),
-          network: 'monad-testnet',
-          explorerUrl: 'https://entropy-explorer.pyth.network/?chain=monad-testnet',
-          monadExplorerUrl: 'https://testnet.monadexplorer.com/',
+          network: 'arbitrum-sepolia',
+          explorerUrl: 'https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia',
+          arbitrumSepoliaExplorerUrl: 'https://sepolia.arbiscan.io/',
           timestamp: Date.now(),
           source: 'Pyth Entropy (API Fallback)'
         },
@@ -184,7 +184,7 @@ class PythEntropyService {
         gameConfig: gameConfig,
         metadata: {
           source: 'Pyth Entropy (Fallback)',
-          network: 'monad-testnet',
+          network: 'arbitrum-sepolia',
           algorithm: 'fallback',
           generatedAt: new Date().toISOString()
         }
@@ -193,18 +193,18 @@ class PythEntropyService {
   }
 
   /**
-   * Get Monad Explorer URL for transaction
+   * Get Arbitrum Sepolia Explorer URL for transaction
    * @param {string} txHash - Transaction hash
-   * @returns {string} Monad Explorer URL
+   * @returns {string} Arbitrum Sepolia Explorer URL
    */
-  getMonadExplorerUrl(txHash) {
-    const network = this.network || 'monad-testnet';
+  getArbitrumSepoliaExplorerUrl(txHash) {
+    const network = this.network || 'arbitrum-sepolia';
     
-    if (network === 'monad-testnet') {
-      return `https://testnet.monadexplorer.com/tx/${txHash}`;
+    if (network === 'arbitrum-sepolia') {
+      return `https://sepolia.arbiscan.io/tx/${txHash}`;
     }
     
-    return `https://testnet.monadexplorer.com/tx/${txHash}`;
+    return `https://sepolia.arbiscan.io/tx/${txHash}`;
   }
 
   /**

@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-11-26T22:03:45.475Z",
+  "summary": {
+    "filesScanned": 238,
+    "filesModified": 1,
+    "totalChanges": 13,
+    "errors": 0
+  },
+  "changes": [
+    {
+      "file": "scripts\\migrate-to-somnia.js",
+      "changes": [
+        {
+          "type": "chainId",
+          "from": 10143,
+          "to": 50312
+        },
+        {
+          "type": "chainId",
+          "from": 10143,
+          "to": 50312
+        },
+        {
+          "type": "chainId",
+          "from": 10143,
+          "to": 50312
+        },
+        {
+          "type": "chainId",
+          "from": 10143,
+          "to": 50312
+        },
+        {
+          "type": "rpcUrl",
+          "from": "https://testnet-rpc.monad.xyz",
+          "to": "https://dream-rpc.somnia.network"
+        },
+        {
+          "type": "rpcUrl",
+          "from": "https://testnet.monad.xyz",
+          "to": "https://dream-rpc.somnia.network"
+        },
+        {
+          "type": "explorerUrl",
+          "from": "https://testnet.monadexplorer.com",
+          "to": "https://shannon-explorer.somnia.network"
+        },
+        {
+          "type": "explorerUrl",
+          "from": "https://explorer.testnet.monad.xyz",
+          "to": "https://shannon-explorer.somnia.network"
+        },
+        {
+          "type": "tokenSymbol",
+          "from": "MON",
+          "to": "STT"
+        },
+        {
+          "type": "tokenSymbol",
+          "from": "MON",
+          "to": "STT"
+        },
+        {
+          "type": "tokenSymbol",
+          "from": "MON",
+          "to": "STT"
+        },
+        {
+          "type": "networkName",
+          "from": "Monad Testnet",
+          "to": "Somnia Testnet"
+        },
+        {
+          "type": "networkName",
+          "from": "Monad",
+          "to": "Somnia Testnet"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "configuration": {
+    "chainIdMapping": {
+      "from": [
+        10143,
+        41454
+      ],
+      "to": 50312
+    },
+    "rpcUrlMapping": {
+      "from": [
+        "https://testnet-rpc.monad.xyz",
+        "https://testnet.monad.xyz"
+      ],
+      "to": "https://dream-rpc.somnia.network"
+    },
+    "explorerUrlMapping": {
+      "from": [
+        "https://testnet.monadexplorer.com",
+        "https://explorer.testnet.monad.xyz"
+      ],
+      "to": "https://shannon-explorer.somnia.network"
+    },
+    "tokenSymbolMapping": {
+      "from": "MON",
+      "to": "STT"
+    }
+  },
+  "preservedFiles": [
+    "src/config/arbitrumSepoliaConfig.js",
+    "src/config/arbitrumTreasury.js",
+    "src/config/pythEntropy.js"
+  ]
+}

@@ -37,13 +37,13 @@ const GameHistoryCard = ({ game, gameType }) => {
   };
 
   const openTransaction = (txHash, logIndex) => {
-    const network = process.env.NEXT_PUBLIC_NETWORK || 'monad-testnet';
+    const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
     let explorerUrl;
     
-    if (network === 'monad-testnet') {
-      explorerUrl = `https://testnet.monadexplorer.com/tx/${txHash}#eventlog`;
+    if (network === 'somnia-testnet-testnet') {
+      explorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}#eventlog`;
     } else {
-      explorerUrl = `https://testnet.monadexplorer.com/tx/${txHash}#eventlog`;
+      explorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}#eventlog`;
     }
     
     window.open(explorerUrl, '_blank');
@@ -201,12 +201,12 @@ const GameHistoryCard = ({ game, gameType }) => {
                 Links:
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                {game?.entropyProof?.monadExplorerUrl && (
+                {game?.entropyProof?.somnia-testnetExplorerUrl && (
                   <Button
                     size="small"
                     variant="outlined"
                     startIcon={<ExternalLink size={12} />}
-                    onClick={() => window.open(game.entropyProof.monadExplorerUrl, '_blank')}
+                    onClick={() => window.open(game.entropyProof.somnia-testnetExplorerUrl, '_blank')}
                     sx={{
                       color: '#8B2398',
                       borderColor: '#8B2398',
@@ -215,7 +215,7 @@ const GameHistoryCard = ({ game, gameType }) => {
                       px: 1
                     }}
                   >
-                    Monad
+                    Somnia Testnet
                   </Button>
                 )}
                 {entropyTransactionHash && (

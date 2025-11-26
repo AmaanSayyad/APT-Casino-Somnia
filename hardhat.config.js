@@ -1,16 +1,30 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config({ path: '.env.local' });
+require("dotenv").config({ path: '.env' });
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.19",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
+    compilers: [
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
-    },
+      {
+        version: "0.8.19",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      }
+    ]
   },
   networks: {
     'arbitrum-sepolia': {
@@ -31,10 +45,10 @@ module.exports = {
         "User-Agent": "hardhat"
       }
     },
-    'monad-testnet': {
-      url: process.env.NEXT_PUBLIC_MONAD_TESTNET_RPC || "https://testnet-rpc.monad.xyz",
+    'somnia-testnet-testnet': {
+      url: process.env.NEXT_PUBLIC_SOMNIA_TESTNET_TESTNET_RPC || "https://dream-rpc.somnia.network",
       accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],
-      chainId: 10143,
+      chainId: 50312,
       timeout: 120000,
       httpHeaders: {
         "User-Agent": "hardhat"

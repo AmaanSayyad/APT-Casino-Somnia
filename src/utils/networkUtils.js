@@ -1,28 +1,28 @@
-// Network utilities for Monad Testnet
-import { monadTestnet } from '@/config/chains';
+// Network utilities for Somnia Testnet
+import { somnia-testnetTestnet } from '@/config/chains';
 
-export const MONAD_TESTNET_CONFIG = {
-  chainId: '0x279f', // 10143 in hex
-  chainName: 'Monad Testnet',
+export const SOMNIA_TESTNET_TESTNET_CONFIG = {
+  chainId: '0xc488', // 10143 in hex
+  chainName: 'Somnia Testnet',
   nativeCurrency: {
-    name: 'Monad',
-    symbol: 'MON',
+    name: 'Somnia Testnet',
+    symbol: 'STT',
     decimals: 18,
   },
-  rpcUrls: ['https://testnet-rpc.monad.xyz'],
-  blockExplorerUrls: ['https://testnet.monadexplorer.com'],
+  rpcUrls: ['https://dream-rpc.somnia.network'],
+  blockExplorerUrls: ['https://shannon-explorer.somnia.network'],
 };
 
-export const switchToMonadTestnet = async () => {
+export const switchToSomnia TestnetTestnet = async () => {
   if (!window.ethereum) {
     throw new Error('MetaMask is not installed');
   }
 
   try {
-    // Try to switch to Monad Testnet
+    // Try to switch to Somnia Testnet
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: MONAD_TESTNET_CONFIG.chainId }],
+      params: [{ chainId: SOMNIA_TESTNET_TESTNET_CONFIG.chainId }],
     });
   } catch (switchError) {
     // If the chain is not added, add it
@@ -30,19 +30,19 @@ export const switchToMonadTestnet = async () => {
       try {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
-          params: [MONAD_TESTNET_CONFIG],
+          params: [SOMNIA_TESTNET_TESTNET_CONFIG],
         });
       } catch (addError) {
-        throw new Error('Failed to add Monad Testnet to MetaMask');
+        throw new Error('Failed to add Somnia Testnet to MetaMask');
       }
     } else {
-      throw new Error('Failed to switch to Monad Testnet');
+      throw new Error('Failed to switch to Somnia Testnet');
     }
   }
 };
 
-export const isMonadTestnet = (chainId) => {
-  return chainId === 10143 || chainId === '0x279f';
+export const isSomnia TestnetTestnet = (chainId) => {
+  return chainId === 50312 || chainId === '0xc488';
 };
 
 export const formatMonBalance = (balance, decimals = 5) => {
@@ -50,6 +50,6 @@ export const formatMonBalance = (balance, decimals = 5) => {
   return `${numBalance.toFixed(decimals)} MON`;
 };
 
-export const getMonadTestnetExplorerUrl = (txHash) => {
-  return `https://testnet.monadexplorer.com/tx/${txHash}`;
+export const getSomnia TestnetTestnetExplorerUrl = (txHash) => {
+  return `https://shannon-explorer.somnia.network/tx/${txHash}`;
 };

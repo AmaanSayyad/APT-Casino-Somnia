@@ -250,16 +250,16 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
     return redNumbers.includes(num) ? '#d82633' : '#333'; // Red or black
   };
 
-  // Open Monad Explorer link for transaction hash
-  const openMonadExplorer = (hash) => {
+  // Open Somnia Testnet Explorer link for transaction hash
+  const openSomnia TestnetExplorer = (hash) => {
     if (hash && hash !== 'unknown') {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'monad-testnet';
+      const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
       let explorerUrl;
       
-      if (network === 'monad-testnet') {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${hash}`;
+      if (network === 'somnia-testnet-testnet') {
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       } else {
-        explorerUrl = `https://testnet.monadexplorer.com/tx/${hash}`;
+        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       }
       
       window.open(explorerUrl, '_blank');
@@ -269,7 +269,7 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
   // Open Entropy Explorer link
   const openEntropyExplorer = (txHash) => {
     if (txHash) {
-      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=monad-testnet&search=${txHash}`;
+      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${txHash}`;
       window.open(entropyExplorerUrl, '_blank');
     }
   };
@@ -584,11 +584,11 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                     </Typography>
                                   </Box>
                                 )}
-                                {(bet.entropyProof?.monadExplorerUrl || bet.vrfProof?.transactionHash) && (
+                                {(bet.entropyProof?.somnia-testnetExplorerUrl || bet.vrfProof?.transactionHash) && (
                                   <Box
                                     onClick={() => {
-                                      const url = bet.entropyProof?.monadExplorerUrl || 
-                                                 `https://testnet.monadexplorer.com/tx/${bet.vrfProof?.transactionHash}`;
+                                      const url = bet.entropyProof?.somnia-testnetExplorerUrl || 
+                                                 `https://shannon-explorer.somnia.network/tx/${bet.vrfProof?.transactionHash}`;
                                       window.open(url, '_blank');
                                     }}
                                     sx={{
@@ -609,7 +609,7 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                   >
                                     <FaExternalLinkAlt size={10} color="#8B2398" />
                                     <Typography variant="caption" sx={{ color: '#8B2398', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                      Monad
+                                      Somnia Testnet
                                     </Typography>
                                   </Box>
                                 )}

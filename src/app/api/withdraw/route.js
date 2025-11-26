@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
+import { somniaTestnetConfig } from '@/config/somniaTestnetConfig';
 
-// Monad Treasury private key from environment
-const MONAD_TREASURY_PRIVATE_KEY = process.env.MONAD_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY || "0x73e0cfb4d786d6e542533e18eb78fb5c727ab802b89c6850962042a8f0835f0c";
+// Somnia Testnet Treasury private key from environment
+const SOMNIA_TREASURY_PRIVATE_KEY = process.env.SOMNIA_TESTNET_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY;
 
-// Monad Testnet RPC URL
-const MONAD_TESTNET_RPC = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://testnet-rpc.monad.xyz';
+// Somnia Testnet RPC URL from config
+const SOMNIA_RPC_URL = somniaTestnetConfig.rpcUrls.default.http[0];
 
 // Create provider and wallet
-const provider = new ethers.JsonRpcProvider(MONAD_TESTNET_RPC);
-const treasuryWallet = new ethers.Wallet(MONAD_TREASURY_PRIVATE_KEY, provider);
+const provider = new ethers.JsonRpcProvider(SOMNIA_RPC_URL);
+const treasuryWallet = SOMNIA_TREASURY_PRIVATE_KEY ? new ethers.Wallet(SOMNIA_TREASURY_PRIVATE_KEY, provider) : null;
 
 export async function POST(request) {
   try {
@@ -29,21 +30,21 @@ export async function POST(request) {
       });
     }
 
-    if (!MONAD_TREASURY_PRIVATE_KEY) {
+    if (!SOMNIA_TREASURY_PRIVATE_KEY || !treasuryWallet) {
       return NextResponse.json(
         { error: 'Treasury not configured' },
         { status: 500 }
       );
     }
 
-    console.log(`🏦 Processing withdrawal: ${amount} MON to ${userAddress}`);
+    console.log(`🏦 Processing withdrawal: ${amount} STT to ${userAddress}`);
     console.log(`📍 Treasury: ${treasuryWallet.address}`);
 
     // Check treasury balance
     let treasuryBalance = 0;
     try {
       treasuryBalance = await provider.getBalance(treasuryWallet.address);
-      console.log(`💰 Treasury balance: ${ethers.formatEther(treasuryBalance)} MON`);
+      console.log(`💰 Treasury balance: ${ethers.formatEther(treasuryBalance)} STT`);
     } catch (balanceError) {
       console.log('⚠️ Could not check treasury balance, proceeding with transfer attempt...');
       console.log('Balance error:', balanceError.message);
@@ -53,7 +54,7 @@ export async function POST(request) {
     const amountWei = ethers.parseEther(amount.toString());
     if (treasuryBalance < amountWei) {
       return NextResponse.json(
-        { error: `Insufficient treasury funds. Available: ${ethers.formatEther(treasuryBalance)} MON, Requested: ${amount} MON` },
+        { error: `Insufficient treasury funds. Available: ${ethers.formatEther(treasuryBalance)} STT, Requested: ${amount} STT` },
         { status: 400 }
       );
     }
@@ -84,8 +85,8 @@ export async function POST(request) {
     console.log(`📤 Transaction sent: ${tx.hash}`);
 
     // Return transaction hash immediately without waiting for confirmation
-    // User can check transaction status on Etherscan
-    console.log(`✅ Withdraw MON to ${userAddress}, TX: ${tx.hash}`);
+    // User can check transaction status on Somnia Explorer
+    console.log(`✅ Withdraw STT to ${userAddress}, TX: ${tx.hash}`);
 
     return new Response(JSON.stringify({
       success: true,
@@ -94,7 +95,7 @@ export async function POST(request) {
       userAddress: userAddress,
       treasuryAddress: treasuryWallet.address,
       status: 'pending',
-      message: 'Transaction sent successfully. Check Etherscan for confirmation.'
+      message: 'Transaction sent successfully. Check Somnia Explorer for confirmation.'
     }), {
       status: 200,
       headers: {
@@ -128,34 +129,31 @@ export async function POST(request) {
 // GET endpoint to check treasury balance
 export async function GET() {
   try {
-    if (!MONAD_TREASURY_PRIVATE_KEY) {
+    if (!SOMNIA_TREASURY_PRIVATE_KEY || !treasuryWallet) {
       return NextResponse.json(
         { error: 'Treasury not configured' },
         { status: 500 }
       );
     }
 
-    const treasuryAccount = new EthereumAccount(
-      new Uint8Array(Buffer.from(MONAD_TREASURY_PRIVATE_KEY.slice(2), 'hex'))
-    );
-
-    const coinClient = new CoinClient(client);
-
     try {
-      const balance = await coinClient.checkBalance(treasuryAccount);
+      const balance = await provider.getBalance(treasuryWallet.address);
 
       return NextResponse.json({
-        treasuryAddress: treasuryAccount.address().hex(),
-        balance: balance / 100000000, // Convert to MON balanceOctas: balance.toString(),
-        status: 'active'
+        treasuryAddress: treasuryWallet.address,
+        balance: ethers.formatEther(balance),
+        balanceWei: balance.toString(),
+        status: 'active',
+        network: 'Somnia Testnet'
       });
     } catch (balanceError) {
       return NextResponse.json({
-        treasuryAddress: treasuryAccount.address().hex(),
-        balance: 0,
-        balanceOctas: '0',
-        status: 'initializing',
-        note: 'Treasury wallet is being initialized. Please wait a few minutes.'
+        treasuryAddress: treasuryWallet.address,
+        balance: '0',
+        balanceWei: '0',
+        status: 'error',
+        error: balanceError.message,
+        network: 'Somnia Testnet'
       });
     }
 

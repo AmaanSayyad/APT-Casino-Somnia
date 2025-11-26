@@ -8,16 +8,16 @@ export default function GameHistory({ history }) {
   // Open Entropy Explorer link
   const openEntropyExplorer = (txHash) => {
     if (txHash) {
-      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=monad-testnet&search=${txHash}`;
+      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${txHash}`;
       window.open(entropyExplorerUrl, '_blank');
     }
   };
 
-  // Open Monad Explorer link
-  const openMonadExplorer = (txHash) => {
+  // Open Somnia Testnet Explorer link
+  const openSomnia TestnetExplorer = (txHash) => {
     if (txHash) {
-      const monadExplorerUrl = `https://testnet.monadexplorer.com/tx/${txHash}`;
-      window.open(monadExplorerUrl, '_blank');
+      const somnia-testnetExplorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
+      window.open(somnia-testnetExplorerUrl, '_blank');
     }
   };
 
@@ -116,17 +116,17 @@ export default function GameHistory({ history }) {
                           <div className="text-yellow-400 font-bold">{game.entropyProof.sequenceNumber && game.entropyProof.sequenceNumber !== '0' ? String(game.entropyProof.sequenceNumber) : ''}</div>
                         </div>
                         <div className="flex gap-1">
-                          {(game.entropyProof.monadExplorerUrl || game.entropyProof.transactionHash) && (
+                          {(game.entropyProof.somnia-testnetExplorerUrl || game.entropyProof.transactionHash) && (
                             <button
                               onClick={() => {
-                                const url = game.entropyProof.monadExplorerUrl || 
-                                           `https://testnet.monadexplorer.com/tx/${game.entropyProof.transactionHash}`;
+                                const url = game.entropyProof.somnia-testnetExplorerUrl || 
+                                           `https://shannon-explorer.somnia.network/tx/${game.entropyProof.transactionHash}`;
                                 window.open(url, '_blank');
                               }}
                               className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
                             >
                               <FaExternalLinkAlt size={8} />
-                              Monad
+                              Somnia Testnet
                             </button>
                           )}
                           {game.entropyProof.transactionHash && (
@@ -140,11 +140,11 @@ export default function GameHistory({ history }) {
                           )}
                           {game.entropyProof.transactionHash && (
                             <button
-                              onClick={() => openMonadExplorer(game.entropyProof.transactionHash)}
+                              onClick={() => openSomnia TestnetExplorer(game.entropyProof.transactionHash)}
                               className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
                             >
                               <FaExternalLinkAlt size={8} />
-                              Monad
+                              Somnia Testnet
                             </button>
                           )}
                         </div>
@@ -166,11 +166,11 @@ export default function GameHistory({ history }) {
                           Entropy
                         </button>
                         <button
-                          onClick={() => openMonadExplorer(game.id)}
+                          onClick={() => openSomnia TestnetExplorer(game.id)}
                           className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
                         >
                           <FaExternalLinkAlt size={8} />
-                          Monad
+                          Somnia Testnet
                         </button>
                       </div>
                     )}

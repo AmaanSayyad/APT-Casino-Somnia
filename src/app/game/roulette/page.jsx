@@ -35,6 +35,7 @@ import { useAccount } from 'wagmi';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance, setLoading, loadBalanceFromStorage } from '@/store/balanceSlice';
 import pythEntropyService from '@/services/PythEntropyService';
+import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
 
 // Ethereum client functions will be added here when needed
 
@@ -1198,6 +1199,9 @@ export default function GameRoulette() {
   const [realBalance, setRealBalance] = useState('0');
   const { balance } = useToken(address); // Keep for compatibility
   const HOUSE_ADDR = CASINO_MODULE_ADDRESS;
+  
+  // Somnia Game Logger
+  const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
 
   // Function to fetch real MON balance will be defined after useSelector
 
@@ -2026,7 +2030,7 @@ export default function GameRoulette() {
             sequenceNumber: entropyResult.entropyProof.sequenceNumber,
             randomValue: entropyResult.randomValue,
             transactionHash: entropyResult.entropyProof.transactionHash,
-            monadExplorerUrl: entropyResult.entropyProof.monadExplorerUrl,
+            arbiscanUrl: entropyResult.entropyProof.arbiscanUrl,
             explorerUrl: entropyResult.entropyProof.explorerUrl,
             timestamp: entropyResult.entropyProof.timestamp,
             source: 'Pyth Entropy'
@@ -2040,6 +2044,39 @@ export default function GameRoulette() {
               updatedHistory[0] = { ...updatedHistory[0], entropyProof: newBet.entropyProof };
             }
             return updatedHistory;
+          });
+          
+          // Log game result to Somnia Testnet (non-blocking)
+          logGame({
+            gameType: 'ROULETTE',
+            betAmount: totalBetAmount.toString(),
+            result: {
+              winningNumber: winningNumber,
+              bets: allBets,
+              winningBets: winningBets,
+              losingBets: losingBets,
+              totalPayout: totalPayout,
+              netResult: netResult
+            },
+            payout: Math.max(0, netResult).toString(),
+            entropyProof: {
+              requestId: entropyResult.entropyProof.requestId,
+              transactionHash: entropyResult.entropyProof.transactionHash
+            }
+          }).then(txHash => {
+            if (txHash) {
+              console.log('✅ Roulette game logged to Somnia:', getExplorerUrl(txHash));
+              // Update betting history with Somnia transaction hash
+              setBettingHistory(prev => {
+                const updatedHistory = [...prev];
+                if (updatedHistory.length > 0) {
+                  updatedHistory[0] = { ...updatedHistory[0], somniaTxHash: txHash };
+                }
+                return updatedHistory;
+              });
+            }
+          }).catch(error => {
+            console.warn('⚠️ Failed to log Roulette game to Somnia:', error);
           });
           
           // Fire-and-forget explorer log via casino wallet

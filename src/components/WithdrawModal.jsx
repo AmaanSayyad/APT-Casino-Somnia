@@ -138,7 +138,7 @@ const WithdrawModal = ({ isOpen, onClose }) => {
                 <FaWallet className="text-2xl text-white" />
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Withdraw MON</h3>
-              <p className="text-gray-400">Transfer your winnings to your Monad Testnet wallet</p>
+              <p className="text-gray-400">Transfer your winnings to your Somnia Testnet wallet</p>
             </div>
             
             <div className="bg-gray-800/50 rounded-lg p-4">

@@ -9,7 +9,7 @@ import { NotificationProvider } from '@/components/NotificationSystem';
 import WalletConnectionGuard from '@/components/WalletConnectionGuard';
 import { ThemeProvider } from 'next-themes';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { monadTestnet } from '@/config/chains';
+import { somniaTestnet } from '@/config/chains';
 import { RainbowKitProvider, getDefaultConfig, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { 
   metaMaskWallet,
@@ -108,14 +108,14 @@ export default function Providers({ children }) {
   console.log('🔧 Providers mounting...');
   console.log('🔧 Project ID: 226b43b703188d269fb70d02c107c34e');
 
-  // RainbowKit configuration for Monad Testnet
+  // RainbowKit configuration for Somnia Testnet
   let config;
   
   try {
     config = getDefaultConfig({
-      appName: 'APT Casino Monad',
+      appName: 'APT Casino',
       projectId: '226b43b703188d269fb70d02c107c34e',
-      chains: [monadTestnet],
+      chains: [somniaTestnet],
       ssr: true,
     });
     console.log('🔧 Config created with getDefaultConfig:', config);
@@ -147,15 +147,15 @@ export default function Providers({ children }) {
         ],
       },
     ], {
-      appName: 'APT Casino Monad',
+      appName: 'APT Casino',
       projectId: '226b43b703188d269fb70d02c107c34e',
     });
 
     config = createConfig({
       connectors,
-      chains: [monadTestnet],
+      chains: [somniaTestnet],
       transports: {
-        [monadTestnet.id]: http(),
+        [somniaTestnet.id]: http(),
       },
       ssr: true,
     });

@@ -3,18 +3,18 @@
 
 // Test Treasury Address (Replace with your actual treasury address in production)
 export const TREASURY_CONFIG = {
-  // Monad Testnet Treasury Wallet (for deposits/withdrawals)
-  ADDRESS: process.env.MONAD_TREASURY_ADDRESS || process.env.TREASURY_ADDRESS || '0x025182b20Da64b5997d09a5a62489741F68d9B96',
+  // Somnia Testnet Treasury Wallet (for deposits/withdrawals)
+  ADDRESS: process.env.SOMNIA_TESTNET_TREASURY_ADDRESS || process.env.TREASURY_ADDRESS || '0x025182b20Da64b5997d09a5a62489741F68d9B96',
   
   // ⚠️  DEVELOPMENT ONLY - Never use in production!
-  PRIVATE_KEY: process.env.MONAD_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY || '0x73e0cfb4d786d6e542533e18eb78fb5c727ab802b89c6850962042a8f0835f0c',
+  PRIVATE_KEY: process.env.SOMNIA_TESTNET_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY || '0x73e0cfb4d786d6e542533e18eb78fb5c727ab802b89c6850962042a8f0835f0c',
   
-  // Network configuration for Monad Testnet (for deposit/withdraw)
+  // Network configuration for Somnia Testnet (for deposit/withdraw)
   NETWORK: {
-    CHAIN_ID: '0x279f', // Monad testnet (10143 in hex)
-    CHAIN_NAME: 'Monad Testnet',
-    RPC_URL: process.env.NEXT_PUBLIC_MONAD_TESTNET_RPC || 'https://testnet-rpc.monad.xyz',
-    EXPLORER_URL: process.env.NEXT_PUBLIC_MONAD_TESTNET_EXPLORER || 'https://testnet.monadexplorer.com'
+    CHAIN_ID: '0xc488', // Somnia Testnet (10143 in hex)
+    CHAIN_NAME: 'Somnia Testnet',
+    RPC_URL: process.env.NEXT_PUBLIC_SOMNIA_TESTNET_TESTNET_RPC || 'https://dream-rpc.somnia.network',
+    EXPLORER_URL: process.env.NEXT_PUBLIC_SOMNIA_TESTNET_TESTNET_EXPLORER || 'https://shannon-explorer.somnia.network'
   },
   
   // Gas settings for transactions
