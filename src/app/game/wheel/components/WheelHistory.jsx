@@ -13,18 +13,18 @@ const WheelHistory = ({ gameHistory = [] }) => {
   const [page, setPage] = useState(1);
 
    // Open Somnia Testnet Explorer link for transaction hash
-   const openSomnia TestnetExplorer = (hash) => {
+   const openSomniaTestnetExplorer = (hash) => {
     if (hash && hash !== 'unknown') {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
-      let explorerUrl;
-      
-      if (network === 'somnia-testnet-testnet') {
-        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
-      } else {
-        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
-      }
-      
+      const explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       window.open(explorerUrl, '_blank');
+    }
+  };
+
+  // Open Entropy Explorer link (Arbitrum Sepolia)
+  const openEntropyExplorer = (txHash) => {
+    if (txHash) {
+      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia&search=${txHash}`;
+      window.open(entropyExplorerUrl, '_blank');
     }
   };
   
@@ -570,14 +570,14 @@ const WheelHistory = ({ gameHistory = [] }) => {
                       borderBottom: '1px solid rgba(104, 29, 219, 0.1)'
                     }}
                   >
-                    {item.entropyProof ? (
+                    {item.entropyProof || item.somniaTxHash ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Chip 
                             icon={<FaCheck size={10} />}
-                            label={item.entropyProof.sequenceNumber ? 
+                            label={item.entropyProof?.sequenceNumber ? 
                                   `#${item.entropyProof.sequenceNumber}` : 
-                                  'N/A'
+                                  'Verified'
                                 }
                             size="small"
                             sx={{ 
@@ -592,51 +592,47 @@ const WheelHistory = ({ gameHistory = [] }) => {
                               }
                             }}
                           />
-                          <Button
-                            onClick={() => {
-                              if (item.entropyProof.transactionHash) {
-                                window.open(`https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${item.entropyProof.transactionHash}`, '_blank');
-                              }
-                            }}
-                            size="small"
-                            startIcon={<FaExternalLinkAlt size={10} />}
-                            sx={{ 
-                              color: '#681DDB',
-                              fontSize: '0.7rem',
-                              minWidth: 'auto',
-                              p: 0,
-                              '&:hover': {
-                                backgroundColor: 'transparent',
-                                textDecoration: 'underline',
-                              }
-                            }}
-                          >
-                            Entropy
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              if (item.entropyProof?.transactionHash) {
-                                window.open(`https://shannon-explorer.somnia.network/tx/${item.entropyProof.transactionHash}`, '_blank');
-                              }
-                            }}
-                            size="small"
-                            startIcon={<FaExternalLinkAlt size={10} />}
-                            sx={{ 
-                              color: '#8B2398',
-                              fontSize: '0.7rem',
-                              minWidth: 'auto',
-                              p: 0,
-                              '&:hover': {
-                                backgroundColor: 'transparent',
-                                textDecoration: 'underline',
-                              }
-                            }}
-                          >
-                            Somnia Testnet
-                          </Button>
+                          {item.somniaTxHash && (
+                            <Button
+                              onClick={() => openSomniaTestnetExplorer(item.somniaTxHash)}
+                              size="small"
+                              startIcon={<FaExternalLinkAlt size={10} />}
+                              sx={{ 
+                                color: '#8B2398',
+                                fontSize: '0.7rem',
+                                minWidth: 'auto',
+                                p: 0,
+                                '&:hover': {
+                                  backgroundColor: 'transparent',
+                                  textDecoration: 'underline',
+                                }
+                              }}
+                            >
+                              Somnia
+                            </Button>
+                          )}
+                          {item.entropyProof?.transactionHash && (
+                            <Button
+                              onClick={() => openEntropyExplorer(item.entropyProof.transactionHash)}
+                              size="small"
+                              startIcon={<FaExternalLinkAlt size={10} />}
+                              sx={{ 
+                                color: '#681DDB',
+                                fontSize: '0.7rem',
+                                minWidth: 'auto',
+                                p: 0,
+                                '&:hover': {
+                                  backgroundColor: 'transparent',
+                                  textDecoration: 'underline',
+                                }
+                              }}
+                            >
+                              Entropy
+                            </Button>
+                          )}
                         </Box>
                         <Typography variant="caption" color="rgba(255,255,255,0.5)">
-                          Pyth Entropy
+                          {item.somniaTxHash ? 'Game logged on Somnia' : 'Pyth Entropy'}
                         </Typography>
                       </Box>
                     ) : (

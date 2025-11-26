@@ -251,25 +251,17 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
   };
 
   // Open Somnia Testnet Explorer link for transaction hash
-  const openSomnia TestnetExplorer = (hash) => {
+  const openSomniaTestnetExplorer = (hash) => {
     if (hash && hash !== 'unknown') {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'somnia-testnet-testnet';
-      let explorerUrl;
-      
-      if (network === 'somnia-testnet-testnet') {
-        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
-      } else {
-        explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
-      }
-      
+      const explorerUrl = `https://shannon-explorer.somnia.network/tx/${hash}`;
       window.open(explorerUrl, '_blank');
     }
   };
 
-  // Open Entropy Explorer link
+  // Open Entropy Explorer link (Arbitrum Sepolia)
   const openEntropyExplorer = (txHash) => {
     if (txHash) {
-      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${txHash}`;
+      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia&search=${txHash}`;
       window.open(entropyExplorerUrl, '_blank');
     }
   };
@@ -526,15 +518,40 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          {bet.entropyProof ? (
+                          {bet.entropyProof || bet.somniaTxHash ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
                               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, alignItems: 'center' }}>
                                 <Typography variant="caption" sx={{ color: '#FFC107', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                                  {bet.entropyProof.sequenceNumber && bet.entropyProof.sequenceNumber !== '0' ? String(bet.entropyProof.sequenceNumber) : ''}
+                                  {bet.entropyProof?.sequenceNumber && bet.entropyProof.sequenceNumber !== '0' ? String(bet.entropyProof.sequenceNumber) : ''}
                                 </Typography>
                               </Box>
                               <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                {bet.entropyProof.arbiscanUrl && (
+                                {bet.somniaTxHash && (
+                                  <Box
+                                    onClick={() => openSomniaTestnetExplorer(bet.somniaTxHash)}
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                      cursor: 'pointer',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      backgroundColor: 'rgba(139, 35, 152, 0.1)',
+                                      border: '1px solid rgba(139, 35, 152, 0.3)',
+                                      transition: 'all 0.2s ease',
+                                      '&:hover': {
+                                        backgroundColor: 'rgba(139, 35, 152, 0.2)',
+                                        transform: 'scale(1.05)'
+                                      }
+                                    }}
+                                  >
+                                    <FaExternalLinkAlt size={10} color="#8B2398" />
+                                    <Typography variant="caption" sx={{ color: '#8B2398', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                      Somnia
+                                    </Typography>
+                                  </Box>
+                                )}
+                                {bet.entropyProof?.arbiscanUrl && (
                                   <Box
                                     onClick={() => window.open(bet.entropyProof.arbiscanUrl, '_blank')}
                                     sx={{
@@ -559,7 +576,7 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                     </Typography>
                                   </Box>
                                 )}
-                                {bet.entropyProof.explorerUrl && (
+                                {bet.entropyProof?.explorerUrl && (
                                   <Box
                                     onClick={() => window.open(bet.entropyProof.explorerUrl, '_blank')}
                                     sx={{
@@ -581,35 +598,6 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                     <FaExternalLinkAlt size={10} color="#681DDB" />
                                     <Typography variant="caption" sx={{ color: '#681DDB', fontSize: '0.7rem', fontWeight: 'bold' }}>
                                       Entropy
-                                    </Typography>
-                                  </Box>
-                                )}
-                                {(bet.entropyProof?.somnia-testnetExplorerUrl || bet.vrfProof?.transactionHash) && (
-                                  <Box
-                                    onClick={() => {
-                                      const url = bet.entropyProof?.somnia-testnetExplorerUrl || 
-                                                 `https://shannon-explorer.somnia.network/tx/${bet.vrfProof?.transactionHash}`;
-                                      window.open(url, '_blank');
-                                    }}
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 0.5,
-                                      cursor: 'pointer',
-                                      padding: '2px 6px',
-                                      borderRadius: '4px',
-                                      backgroundColor: 'rgba(139, 35, 152, 0.1)',
-                                      border: '1px solid rgba(139, 35, 152, 0.3)',
-                                      transition: 'all 0.2s ease',
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(139, 35, 152, 0.2)',
-                                        transform: 'scale(1.05)'
-                                      }
-                                    }}
-                                  >
-                                    <FaExternalLinkAlt size={10} color="#8B2398" />
-                                    <Typography variant="caption" sx={{ color: '#8B2398', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                      Somnia Testnet
                                     </Typography>
                                   </Box>
                                 )}

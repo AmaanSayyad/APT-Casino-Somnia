@@ -5,37 +5,19 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 export default function GameHistory({ history }) {
   const [visibleCount, setVisibleCount] = useState(5);
   
-  // Open Entropy Explorer link
+  // Open Entropy Explorer link (Arbitrum Sepolia)
   const openEntropyExplorer = (txHash) => {
     if (txHash) {
-      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=somnia-testnet-testnet&search=${txHash}`;
+      const entropyExplorerUrl = `https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia&search=${txHash}`;
       window.open(entropyExplorerUrl, '_blank');
     }
   };
 
   // Open Somnia Testnet Explorer link
-  const openSomnia TestnetExplorer = (txHash) => {
+  const openSomniaTestnetExplorer = (txHash) => {
     if (txHash) {
-      const somnia-testnetExplorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
-      window.open(somnia-testnetExplorerUrl, '_blank');
-    }
-  };
-
-  // Open Arbiscan link for transaction hash
-  const openArbiscan = (hash) => {
-    if (hash && hash !== 'unknown') {
-      const network = process.env.NEXT_PUBLIC_NETWORK || 'arbitrum-sepolia';
-      let explorerUrl;
-      
-      if (network === 'arbitrum-sepolia') {
-        explorerUrl = `https://sepolia.arbiscan.io/tx/${hash}`;
-      } else if (network === 'arbitrum-one') {
-        explorerUrl = `https://arbiscan.io/tx/${hash}`;
-      } else {
-        explorerUrl = `https://sepolia.etherscan.io/tx/${hash}`;
-      }
-      
-      window.open(explorerUrl, '_blank');
+      const somniaExplorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
+      window.open(somniaExplorerUrl, '_blank');
     }
   };
   
@@ -110,26 +92,22 @@ export default function GameHistory({ history }) {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex flex-col gap-1">
-                    {game.entropyProof ? (
+                    {game.entropyProof || game.somniaTxHash ? (
                       <>
                         <div className="text-xs text-gray-300 font-mono">
-                          <div className="text-yellow-400 font-bold">{game.entropyProof.sequenceNumber && game.entropyProof.sequenceNumber !== '0' ? String(game.entropyProof.sequenceNumber) : ''}</div>
+                          <div className="text-yellow-400 font-bold">{game.entropyProof?.sequenceNumber && game.entropyProof.sequenceNumber !== '0' ? String(game.entropyProof.sequenceNumber) : ''}</div>
                         </div>
                         <div className="flex gap-1">
-                          {(game.entropyProof.somnia-testnetExplorerUrl || game.entropyProof.transactionHash) && (
+                          {game.somniaTxHash && (
                             <button
-                              onClick={() => {
-                                const url = game.entropyProof.somnia-testnetExplorerUrl || 
-                                           `https://shannon-explorer.somnia.network/tx/${game.entropyProof.transactionHash}`;
-                                window.open(url, '_blank');
-                              }}
+                              onClick={() => openSomniaTestnetExplorer(game.somniaTxHash)}
                               className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
                             >
                               <FaExternalLinkAlt size={8} />
-                              Somnia Testnet
+                              Somnia
                             </button>
                           )}
-                          {game.entropyProof.transactionHash && (
+                          {game.entropyProof?.transactionHash && (
                             <button
                               onClick={() => openEntropyExplorer(game.entropyProof.transactionHash)}
                               className="flex items-center gap-1 px-2 py-1 bg-[#681DDB]/10 border border-[#681DDB]/30 rounded text-[#681DDB] text-xs hover:bg-[#681DDB]/20 transition-colors"
@@ -138,40 +116,12 @@ export default function GameHistory({ history }) {
                               Entropy
                             </button>
                           )}
-                          {game.entropyProof.transactionHash && (
-                            <button
-                              onClick={() => openSomnia TestnetExplorer(game.entropyProof.transactionHash)}
-                              className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
-                            >
-                              <FaExternalLinkAlt size={8} />
-                              Somnia Testnet
-                            </button>
-                          )}
                         </div>
                       </>
                     ) : (
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => openArbiscan(game.id)}
-                          className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 border border-blue-500/30 rounded text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
-                        >
-                          <FaExternalLinkAlt size={8} />
-                          Arbiscan
-                        </button>
-                        <button
-                          onClick={() => openEntropyExplorer(game.id)}
-                          className="flex items-center gap-1 px-2 py-1 bg-[#681DDB]/10 border border-[#681DDB]/30 rounded text-[#681DDB] text-xs hover:bg-[#681DDB]/20 transition-colors"
-                        >
-                          <FaExternalLinkAlt size={8} />
-                          Entropy
-                        </button>
-                        <button
-                          onClick={() => openSomnia TestnetExplorer(game.id)}
-                          className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
-                        >
-                          <FaExternalLinkAlt size={8} />
-                          Somnia Testnet
-                        </button>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-purple-400 text-xs">Generating...</span>
                       </div>
                     )}
                   </div>
