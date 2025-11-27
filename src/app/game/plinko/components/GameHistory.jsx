@@ -148,3 +148,4 @@ export default function GameHistory({ history }) {
     </div>
   );
 }
+

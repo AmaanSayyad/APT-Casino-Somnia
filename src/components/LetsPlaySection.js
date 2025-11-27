@@ -8,7 +8,7 @@ export default function LetsPlaySection() {
   const [stats, setStats] = useState([
     { icon: <FaUsers className="text-red-magic" />, value: 0, target: 12000, label: "Players" },
     { icon: <FaTrophy className="text-blue-magic" />, value: 0, target: 25000, label: "Winners" },
-    { icon: <FaCoins className="text-yellow-400" />, value: 0, target: 1000000, label: "MON Wagered" }
+    { icon: <FaCoins className="text-yellow-400" />, value: 0, target: 1000000, label: "STT Wagered" }
   ]);
   
   // Animate stats when component mounts

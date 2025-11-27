@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '@/config/contracts';
 
+/**
+ * Deposit API - Somnia Testnet
+ * 
+ * NETWORK ARCHITECTURE:
+ * This API processes deposits on Somnia Testnet using STT tokens.
+ * Validates: Requirements 2.3, 12.1
+ */
+
 // Somnia Testnet Treasury address from config
 const SOMNIA_TREASURY_ADDRESS = SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET].treasury;
 
@@ -102,3 +110,4 @@ export async function GET(request) {
     );
   }
 }
+

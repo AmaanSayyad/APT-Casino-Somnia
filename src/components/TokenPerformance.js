@@ -55,7 +55,7 @@ const TokenPerformance = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex items-center mb-8">
           <div className="w-1 h-6 bg-gradient-to-r from-red-magic to-blue-magic rounded-full mr-3"></div>
-          <h2 className="text-2xl font-display font-bold text-white">MON token Performance</h2>
+          <h2 className="text-2xl font-display font-bold text-white">STT token Performance</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -68,7 +68,7 @@ const TokenPerformance = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-magic to-blue-magic flex items-center justify-center mr-2">
                       <span className="text-white font-bold text-sm">A</span>
                     </div>
-                    <h3 className="text-white text-xl font-medium">MON</h3>
+                    <h3 className="text-white text-xl font-medium">STT</h3>
                     <span className={`ml-3 px-2 py-1 rounded text-xs ${
                       tokenData.priceChange24h >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                     }`}>
@@ -140,9 +140,9 @@ const TokenPerformance = () => {
             
             <div className="p-[1px] bg-gradient-to-r from-red-magic to-blue-magic rounded-xl">
               <div className="bg-[#1A0015] rounded-xl p-6">
-                <h3 className="text-white text-lg font-medium mb-2">Ready to invest in MON?</h3>
+                <h3 className="text-white text-lg font-medium mb-2">Ready to invest in STT?</h3>
                 <p className="text-white/70 text-sm mb-4">
-                  Stake MON to earn passive income while playing your favorite games.
+                  Stake STT to earn passive income while playing your favorite games.
                 </p>
                 <Link href="/bank">
                   <div className="block w-full">

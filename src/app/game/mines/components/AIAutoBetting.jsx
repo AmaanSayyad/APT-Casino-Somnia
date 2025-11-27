@@ -153,7 +153,7 @@ const AIAutoBetting = ({ onActivate, isActive, onSettings }) => {
                   <div>
                     <div className="flex items-center justify-between text-xs text-white/70 mb-2">
                       <span>Mode: <span className="text-blue-300 font-medium">{currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}</span></span>
-                      <span>Model: <span className="text-blue-300">MON GamingGPT v2</span></span>
+                      <span>Model: <span className="text-blue-300">STT GamingGPT v2</span></span>
                     </div>
                     <AnimatePresence>
                       {lastAction && (
@@ -236,7 +236,7 @@ const AIAutoBetting = ({ onActivate, isActive, onSettings }) => {
                   <div className="bg-black/30 p-2 rounded-lg border border-blue-900/30">
                     <div className="text-white/60 text-xs mb-1">Profit</div>
                     <div className={`text-sm font-medium ${stats.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {stats.profit >= 0 ? '+' : ''}{stats.profit} MON
+                      {stats.profit >= 0 ? '+' : ''}{stats.profit} STT
                     </div>
                   </div>
                 </div>

@@ -1,5 +1,13 @@
 import pythEntropyService from '@/services/PythEntropyService';
 
+/**
+ * Pyth Entropy Test API - Arbitrum Sepolia
+ * 
+ * NETWORK ARCHITECTURE:
+ * This API tests Pyth Entropy on Arbitrum Sepolia.
+ * Entropy generation MUST remain on Arbitrum Sepolia (Requirements 3.1-3.5).
+ * DO NOT migrate to Somnia Testnet.
+ */
 export async function GET(request) {
   try {
     // Initialize Pyth Entropy service
@@ -68,5 +76,6 @@ export async function POST(request) {
     );
   }
 }
+
 
 

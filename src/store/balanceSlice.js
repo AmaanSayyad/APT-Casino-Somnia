@@ -93,3 +93,4 @@ export const saveBalanceToStorage = (balance) => {
 };
 
 export default balanceSlice.reducer;
+

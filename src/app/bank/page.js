@@ -264,7 +264,7 @@ export default function Bank() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-[#250020] p-4 rounded-lg hover:bg-[#350030] transition-colors">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-white/70 text-sm">MON Price</span>
+                        <span className="text-white/70 text-sm">STT Price</span>
                         <div className="flex items-center">
                           <div className="h-2 w-16 bg-[#120010] rounded-full overflow-hidden">
                             <div 
@@ -413,7 +413,7 @@ export default function Bank() {
               </p>
               <ul className="space-y-2 mb-4">
                 <li className="flex justify-between">
-                  <span className="text-white/60">MON</span>
+                  <span className="text-white/60">STT</span>
                   <span className="text-green-500">12.5% APY</span>
                 </li>
                 <li className="flex justify-between">
@@ -483,3 +483,4 @@ export default function Bank() {
     </div>
   );
 }
+

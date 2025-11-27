@@ -3,6 +3,11 @@ import { GameHistoryService } from '../../../services/GameHistoryService';
 /**
  * Game History API
  * Retrieves game history for a user with VRF details
+ * 
+ * NETWORK ARCHITECTURE:
+ * - Game results are stored with Somnia Testnet transaction hashes
+ * - VRF/Entropy details reference Arbitrum Sepolia transactions
+ * - This provides dual verification: provably fair randomness + on-chain game logs
  */
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

@@ -426,3 +426,4 @@ export class SomniaGameLogger {
 // Export singleton instance (will be initialized when provider is available)
 export const somniaGameLogger = new SomniaGameLogger();
 export default SomniaGameLogger;
+

@@ -586,7 +586,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
         betAmount: latestBetAmount,
         balanceInETH: currentBalance.toFixed(9)
       });
-              alert(`Insufficient balance! You have ${currentBalance.toFixed(9)} MON but need ${latestBetAmount} MON`);
+              alert(`Insufficient balance! You have ${currentBalance.toFixed(9)} STT but need ${latestBetAmount} STT`);
       return;
     }
     
@@ -770,7 +770,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
               {betHistory.slice(0, 5).map((bet, index) => (
                 <div key={index} className="w-16 h-16 bg-[#2A0025] border border-[#333947] rounded-lg flex flex-col items-center justify-center p-1">
                   <span className="w-full text-center leading-tight text-xs font-bold text-white">{bet.multiplier}</span>
-                  <span className="w-full text-center leading-tight text-[10px] text-green-400">+{bet.payout} MON</span>
+                  <span className="w-full text-center leading-tight text-[10px] text-green-400">+{bet.payout} STT</span>
                 </div>
               ))}
               {Array.from({ length: Math.max(0, 5 - Math.min(5, betHistory.length)) }).map((_, index) => (
@@ -828,7 +828,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
           <div className="text-xs text-gray-400">Best Multiplier</div>
         </div>
         <div className="text-center">
-                          <div className="text-2xl font-bold text-white">{totalWon.toFixed(5)} MON</div>
+                          <div className="text-2xl font-bold text-white">{totalWon.toFixed(5)} STT</div>
           <div className="text-xs text-gray-400">Total Won</div>
         </div>
       </div>

@@ -286,3 +286,4 @@ class EntropyExplorerService {
 const entropyExplorerService = new EntropyExplorerService();
 
 export default entropyExplorerService;
+

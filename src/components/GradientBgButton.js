@@ -10,3 +10,4 @@ export default function GradientBgButton({ children, classes, onClick }) {
     </button>
   );
 }
+

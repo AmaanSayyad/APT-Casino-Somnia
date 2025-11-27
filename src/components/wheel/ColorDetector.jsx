@@ -122,3 +122,4 @@ const ColorDetector = ({ wheelPosition, wheelData, segments, onColorDetected }) 
 };
 
 export default ColorDetector;
+

@@ -41,13 +41,13 @@ const useTokenStats = () => {
         // This would typically come from your smart contract
         const calculatedAPY = 5.8 + (Math.random() * 1.2); // Simulating a fluctuating APY
         
-        // Total MON pool would come from your contract or API
+        // Total STT pool would come from your contract or API
         const totalPoolSize = 203746 + (Math.random() * 1000 - 500); // Simulating fluctuation
         
         // Update the stats
         setStats({
           totalOGPool: totalPoolSize.toFixed(0),
-          ogPrice: priceData.usd / 100, // Using a fraction of MON price for demo
+          ogPrice: priceData.usd / 100, // Using a fraction of STT price for demo
           ogAPY: calculatedAPY.toFixed(2),
           marketCap: (totalPoolSize * (priceData.usd / 100)).toFixed(2),
           volume24h: (priceData.usd_24h_vol / 1000).toFixed(2),

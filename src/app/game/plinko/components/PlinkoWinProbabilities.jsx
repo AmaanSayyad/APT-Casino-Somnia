@@ -55,3 +55,4 @@ const PlinkoWinProbabilities = ({ risk = 'Medium' }) => {
 export default PlinkoWinProbabilities;
 
 
+

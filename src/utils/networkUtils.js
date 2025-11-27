@@ -47,7 +47,7 @@ export const isSomnia TestnetTestnet = (chainId) => {
 
 export const formatMonBalance = (balance, decimals = 5) => {
   const numBalance = parseFloat(balance || '0');
-  return `${numBalance.toFixed(decimals)} MON`;
+  return `${numBalance.toFixed(decimals)} STT`;
 };
 
 export const getSomnia TestnetTestnetExplorerUrl = (txHash) => {

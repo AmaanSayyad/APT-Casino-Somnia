@@ -24,3 +24,4 @@ export default function GlobalWalletManager() {
   // This component doesn't render anything, it just manages wallet state
   return null;
 }
+

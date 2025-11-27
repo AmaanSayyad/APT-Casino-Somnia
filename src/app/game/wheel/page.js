@@ -184,11 +184,11 @@ export default function Home() {
     }
   };
 
-    // Check Redux balance (balance is already in MON)
+    // Check Redux balance (balance is already in STT)
     const currentBalance = parseFloat(userBalance || '0');
     
     if (currentBalance < betAmount) {
-      alert(`Insufficient balance. You have ${currentBalance.toFixed(5)} MON but need ${betAmount} MON`);
+      alert(`Insufficient balance. You have ${currentBalance.toFixed(5)} STT but need ${betAmount} STT`);
       return;
     }
 
@@ -205,7 +205,7 @@ export default function Home() {
       const newBalance = (parseFloat(userBalance || '0') - betAmount).toString();
       dispatch(setBalance(newBalance));
       
-      console.log('balance MON');
+      console.log('balance STT');
       
       // Set up callback to handle wheel animation completion
       window.wheelBetCallback = async (landedMultiplier) => {
@@ -269,7 +269,7 @@ export default function Home() {
           
           // Show result and update balance immediately
           if (actualMultiplier > 0) {
-            notification.success(`Congratulations! ${betAmount} MON × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(5)} MON won!`);
+            notification.success(`Congratulations! ${betAmount} STT × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(5)} STT won!`);
             
             // Update balance with winnings
             const currentBalance = parseFloat(userBalance || '0');
@@ -361,7 +361,7 @@ export default function Home() {
       });
       
       if (currentBalance < currentBet) {
-        alert(`Insufficient balance for bet ${i + 1}. Need ${currentBet.toFixed(5)} MON but have ${currentBalance.toFixed(5)} MON`);
+        alert(`Insufficient balance for bet ${i + 1}. Need ${currentBet.toFixed(5)} STT but have ${currentBalance.toFixed(5)} STT`);
         break;
       }
 
@@ -464,7 +464,7 @@ export default function Home() {
       
       // Show notification for win
       if (actualMultiplier > 0) {
-        notification.success(`Congratulations! ${currentBet} MON × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(8)} MON won!`);
+        notification.success(`Congratulations! ${currentBet} STT × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(8)} STT won!`);
       }
 
       // Store history entry
@@ -536,8 +536,8 @@ export default function Home() {
     // Sample statistics
     const gameStatistics = {
       totalBets: '1,856,342',
-      totalVolume: '8.3M MON',
-      maxWin: '243,500 MON'
+      totalVolume: '8.3M STT',
+      maxWin: '243,500 STT'
     };
     
     return (

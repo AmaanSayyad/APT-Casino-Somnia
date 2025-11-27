@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { somniaTestnetConfig } from '@/config/somniaTestnetConfig';
 
+/**
+ * Withdraw API - Somnia Testnet
+ * 
+ * NETWORK ARCHITECTURE:
+ * This API processes withdrawals on Somnia Testnet using STT tokens.
+ * Validates: Requirements 2.4, 12.2
+ */
+
 // Somnia Testnet Treasury private key from environment
 const SOMNIA_TREASURY_PRIVATE_KEY = process.env.SOMNIA_TESTNET_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY;
 

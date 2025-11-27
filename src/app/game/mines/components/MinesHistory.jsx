@@ -367,3 +367,4 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
 };
 
 export default MinesHistory;
+

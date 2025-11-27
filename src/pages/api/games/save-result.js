@@ -3,6 +3,11 @@ import { gameHistory } from '../../../services/GameHistoryService.js';
 /**
  * Save Game Result API
  * POST /api/games/save-result - Save game result with VRF details
+ * 
+ * NETWORK ARCHITECTURE:
+ * - Game results are logged to Somnia Testnet (on-chain verification)
+ * - Entropy/VRF remains on Arbitrum Sepolia (provably fair randomness)
+ * - This API accepts somniaTxHash from the frontend after logging to Somnia
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -25,7 +30,9 @@ export default async function handler(req, res) {
       gameConfig,
       resultData,
       betAmount,
-      payoutAmount
+      payoutAmount,
+      somniaTxHash,      // Transaction hash from Somnia Testnet game logging
+      somniaBlockNumber  // Block number from Somnia Testnet
     } = req.body;
 
     // Validate required fields
@@ -52,7 +59,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Save game result
+    // Save game result with Somnia transaction details
     const savedGame = await gameHistory.saveGameResult({
       vrfRequestId,
       userAddress,
@@ -60,7 +67,10 @@ export default async function handler(req, res) {
       gameConfig,
       resultData,
       betAmount: betAmount ? BigInt(betAmount) : null,
-      payoutAmount: payoutAmount ? BigInt(payoutAmount) : null
+      payoutAmount: payoutAmount ? BigInt(payoutAmount) : null,
+      somniaTxHash,           // Somnia Testnet transaction hash
+      somniaBlockNumber,      // Somnia Testnet block number
+      network: 'somnia-testnet' // Explicitly mark as Somnia network
     });
 
     // Get VRF details if available
@@ -117,6 +127,14 @@ export default async function handler(req, res) {
  *     }
  *   },
  *   "betAmount": "1000000000000000000",
- *   "payoutAmount": "36000000000000000000"
+ *   "payoutAmount": "36000000000000000000",
+ *   "somniaTxHash": "0xabc123...",
+ *   "somniaBlockNumber": 12345678
  * }
+ * 
+ * NETWORK NOTES:
+ * - somniaTxHash: Transaction hash from Somnia Testnet (game logging)
+ * - vrfRequestId: Links to Arbitrum Sepolia entropy transaction
+ * - This dual-network approach ensures provably fair randomness (Arbitrum)
+ *   with transparent on-chain game logging (Somnia)
  */

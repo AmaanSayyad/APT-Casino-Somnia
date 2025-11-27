@@ -13,7 +13,7 @@ const MOCK_LENDING_DATA = {
     },
     {
       symbol: 'STT',
-      name: 'MON Casino Token',
+      name: 'STT Casino Token',
       amount: '500.0',
       apy: '12.5',
       iconColor: '#34C759'

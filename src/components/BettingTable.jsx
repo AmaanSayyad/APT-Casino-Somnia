@@ -156,3 +156,4 @@ const BettingTable = ({ data }) => {
 };
 
 export default BettingTable;
+

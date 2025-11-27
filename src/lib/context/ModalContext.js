@@ -22,3 +22,4 @@ export const ModalProvider = ({ children }) => {
 };
 
 export const useModal = () => useContext(ModalContext);
+

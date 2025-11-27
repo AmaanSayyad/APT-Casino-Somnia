@@ -173,7 +173,7 @@ const WheelPayouts = () => {
                 Bet Amount
               </Typography>
               <Typography variant="h6" color="white" fontWeight="bold">
-                100 MON
+                100 STT
               </Typography>
             </Box>
             
@@ -215,7 +215,7 @@ const WheelPayouts = () => {
                 Payout
               </Typography>
               <Typography variant="h6" color="#14D854" fontWeight="bold">
-                500 MON
+                500 STT
               </Typography>
             </Box>
           </Box>
@@ -285,12 +285,12 @@ const WheelPayouts = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <GiPayMoney color="#FFA500" />
-                          <Typography>{example.bet} MON</Typography>
+                          <Typography>{example.bet} STT</Typography>
                         </Box>
                       </TableCell>
                       <TableCell>{example.multiplier}</TableCell>
-                      <TableCell sx={{ color: '#FFA500', fontWeight: 'medium' }}>{example.payout} MON</TableCell>
-                      <TableCell sx={{ color: '#14D854', fontWeight: 'medium' }}>+{example.profit} MON</TableCell>
+                      <TableCell sx={{ color: '#FFA500', fontWeight: 'medium' }}>{example.payout} STT</TableCell>
+                      <TableCell sx={{ color: '#14D854', fontWeight: 'medium' }}>+{example.profit} STT</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -331,7 +331,7 @@ const WheelPayouts = () => {
             Maximum Payout
           </Typography>
           <Typography variant="body2" color="rgba(255,255,255,0.7)">
-            The maximum payout per spin is capped at 1,000,000 MON. This means that regardless of your bet amount and the multiplier, you cannot win more than 1,000,000 MON in a single spin.
+            The maximum payout per spin is capped at 1,000,000 STT. This means that regardless of your bet amount and the multiplier, you cannot win more than 1,000,000 STT in a single spin.
           </Typography>
         </Box>
       </Box>
@@ -340,3 +340,4 @@ const WheelPayouts = () => {
 };
 
 export default WheelPayouts;
+

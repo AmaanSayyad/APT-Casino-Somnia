@@ -35,3 +35,4 @@ const GameDescription = ({ data }) => (
 );
 
 export default GameDescription;
+

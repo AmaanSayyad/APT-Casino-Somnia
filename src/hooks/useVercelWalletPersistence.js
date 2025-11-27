@@ -178,3 +178,4 @@ export const useVercelWalletPersistence = () => {
     globalState: globalState.current
   };
 };
+

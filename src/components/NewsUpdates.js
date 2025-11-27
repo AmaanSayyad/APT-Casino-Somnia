@@ -16,7 +16,7 @@ const NewsUpdates = () => {
     },
     {
       id: 2,
-      title: 'MON Governance Proposal: Community Jackpots',
+      title: 'STT Governance Proposal: Community Jackpots',
       excerpt: 'Vote on the new proposal to allocate 5% of platform fees to community-controlled jackpot pools.',
       date: '2025-05-04',
       category: 'Governance',

@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 /**
  * Game History Service
  * Handles saving and retrieving game results with VRF transaction hashes
+ * Updated for dual-network support: Somnia Testnet for game logs, Arbitrum Sepolia for entropy
  */
 export class GameHistoryService {
   constructor() {
@@ -45,7 +46,10 @@ export class GameHistoryService {
         gameConfig,
         resultData,
         betAmount,
-        payoutAmount
+        payoutAmount,
+        somniaTxHash,
+        somniaBlockNumber,
+        network = 'somnia-testnet'
       } = gameData;
 
       // Validate required fields
@@ -63,6 +67,11 @@ export class GameHistoryService {
         throw new Error('Invalid game type');
       }
 
+      // Validate Somnia transaction hash if provided
+      if (somniaTxHash && !/^0x[a-fA-F0-9]{64}$/.test(somniaTxHash)) {
+        throw new Error('Invalid Somnia transaction hash format');
+      }
+
       const query = `
         INSERT INTO game_results (
           vrf_request_id,
@@ -72,8 +81,11 @@ export class GameHistoryService {
           result_data,
           bet_amount,
           payout_amount,
+          somnia_tx_hash,
+          somnia_block_number,
+          network,
           created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
         RETURNING *
       `;
 
@@ -84,13 +96,19 @@ export class GameHistoryService {
         JSON.stringify(gameConfig),
         JSON.stringify(resultData),
         betAmount ? betAmount.toString() : null,
-        payoutAmount ? payoutAmount.toString() : null
+        payoutAmount ? payoutAmount.toString() : null,
+        somniaTxHash || null,
+        somniaBlockNumber || null,
+        network
       ];
 
       const result = await this.pool.query(query, values);
       const savedGame = result.rows[0];
 
-      console.log(`✅ Game result saved: ${gameType} for user ${userAddress}`);
+      console.log(`✅ Game result saved: ${gameType} for user ${userAddress}`, {
+        somniaTxHash: savedGame.somnia_tx_hash,
+        network: savedGame.network
+      });
 
       return {
         id: savedGame.id,
@@ -101,6 +119,9 @@ export class GameHistoryService {
         resultData: JSON.parse(savedGame.result_data),
         betAmount: savedGame.bet_amount,
         payoutAmount: savedGame.payout_amount,
+        somniaTxHash: savedGame.somnia_tx_hash,
+        somniaBlockNumber: savedGame.somnia_block_number,
+        network: savedGame.network,
         createdAt: savedGame.created_at
       };
 
@@ -113,7 +134,7 @@ export class GameHistoryService {
   /**
    * Get VRF details for a game result
    * @param {string} vrfRequestId - VRF request ID
-   * @returns {Promise<Object>} VRF details
+   * @returns {Promise<Object>} VRF details (always from Arbitrum Sepolia)
    */
   async getVRFDetails(vrfRequestId) {
     this.ensureInitialized();
@@ -142,6 +163,9 @@ export class GameHistoryService {
 
       const vrf = result.rows[0];
 
+      // VRF details always point to Arbitrum Sepolia (entropy network)
+      const arbitrumSepoliaExplorer = process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER || 'https://sepolia.arbiscan.io';
+
       return {
         requestId: vrf.request_id,
         transactionHash: vrf.transaction_hash,
@@ -152,8 +176,10 @@ export class GameHistoryService {
         status: vrf.status,
         createdAt: vrf.created_at,
         fulfilledAt: vrf.fulfilled_at,
-        etherscanUrl: `${process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER}/tx/${vrf.transaction_hash}`,
-        verifiable: true
+        etherscanUrl: `${arbitrumSepoliaExplorer}/tx/${vrf.transaction_hash}`,
+        network: 'arbitrum-sepolia',
+        verifiable: true,
+        verificationNote: 'Entropy generated on Arbitrum Sepolia via Pyth Entropy'
       };
 
     } catch (error) {
@@ -166,7 +192,7 @@ export class GameHistoryService {
    * Get user's game history
    * @param {string} userAddress - User's Ethereum address
    * @param {Object} options - Query options
-   * @returns {Promise<Object>} Game history
+   * @returns {Promise<Object>} Game history with dual-network support
    */
   async getUserHistory(userAddress, options = {}) {
     this.ensureInitialized();
@@ -179,7 +205,7 @@ export class GameHistoryService {
         includeVrfDetails = true
       } = options;
 
-      // Build query
+      // Build query with Somnia transaction hash
       let query = `
         SELECT 
           gr.id,
@@ -190,11 +216,14 @@ export class GameHistoryService {
           gr.result_data,
           gr.bet_amount,
           gr.payout_amount,
+          gr.somnia_tx_hash,
+          gr.somnia_block_number,
+          gr.network,
           gr.created_at,
           ${includeVrfDetails ? `
           vr.request_id as vrf_request_id_string,
-          vr.transaction_hash,
-          vr.block_number,
+          vr.transaction_hash as entropy_tx_hash,
+          vr.block_number as entropy_block_number,
           vr.vrf_value,
           vr.fulfilled_at,
           vr.game_sub_type,
@@ -225,6 +254,10 @@ export class GameHistoryService {
 
       const result = await this.pool.query(query, queryParams);
 
+      // Get explorer URLs
+      const somniaExplorer = process.env.NEXT_PUBLIC_SOMNIA_EXPLORER || 'https://shannon-explorer.somnia.network';
+      const arbitrumSepoliaExplorer = process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER || 'https://sepolia.arbiscan.io';
+
       // Process results
       const games = result.rows.map(row => {
         const game = {
@@ -238,21 +271,34 @@ export class GameHistoryService {
           payoutAmount: row.payout_amount,
           profitLoss: row.profit_loss,
           createdAt: row.created_at,
-          isWin: row.payout_amount > row.bet_amount
+          isWin: row.payout_amount > row.bet_amount,
+          network: row.network || 'somnia-testnet'
         };
 
-        // Add VRF details if available
-        if (includeVrfDetails && row.transaction_hash) {
+        // Add Somnia transaction details (game log on Somnia Testnet)
+        if (row.somnia_tx_hash) {
+          game.somniaTransaction = {
+            transactionHash: row.somnia_tx_hash,
+            blockNumber: row.somnia_block_number,
+            explorerUrl: `${somniaExplorer}/tx/${row.somnia_tx_hash}`,
+            network: 'somnia-testnet',
+            verificationNote: 'Game result logged on Somnia Testnet - click to verify'
+          };
+        }
+
+        // Add VRF details if available (entropy from Arbitrum Sepolia)
+        if (includeVrfDetails && row.entropy_tx_hash) {
           game.vrfDetails = {
             requestId: row.vrf_request_id_string,
-            transactionHash: row.transaction_hash,
-            blockNumber: row.block_number,
+            transactionHash: row.entropy_tx_hash,
+            blockNumber: row.entropy_block_number,
             vrfValue: row.vrf_value,
             fulfilledAt: row.fulfilled_at,
             gameSubType: row.game_sub_type,
-            etherscanUrl: `${process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER}/tx/${row.transaction_hash}`,
+            etherscanUrl: `${arbitrumSepoliaExplorer}/tx/${row.entropy_tx_hash}`,
+            network: 'arbitrum-sepolia',
             verifiable: true,
-            verificationNote: "This result was generated using Pyth Entropy - click to verify on Etherscan"
+            verificationNote: 'Entropy generated on Arbitrum Sepolia via Pyth Entropy - click to verify'
           };
         }
 
@@ -453,8 +499,9 @@ export class GameHistoryService {
           gr.game_type,
           gr.bet_amount,
           gr.payout_amount,
+          gr.somnia_tx_hash,
           gr.created_at,
-          vr.transaction_hash,
+          vr.transaction_hash as entropy_tx_hash,
           CASE 
             WHEN gr.payout_amount > gr.bet_amount THEN 'win'
             ELSE 'loss'
@@ -478,6 +525,9 @@ export class GameHistoryService {
 
       const result = await this.pool.query(query, queryParams);
 
+      const somniaExplorer = process.env.NEXT_PUBLIC_SOMNIA_EXPLORER || 'https://shannon-explorer.somnia.network';
+      const arbitrumSepoliaExplorer = process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER || 'https://sepolia.arbiscan.io';
+
       return result.rows.map(row => ({
         id: row.id,
         userAddress: row.user_address,
@@ -485,10 +535,13 @@ export class GameHistoryService {
         betAmount: row.bet_amount,
         payoutAmount: row.payout_amount,
         result: row.result,
-        transactionHash: row.transaction_hash,
+        somniaTransactionHash: row.somnia_tx_hash,
+        entropyTransactionHash: row.entropy_tx_hash,
         createdAt: row.created_at,
-        etherscanUrl: row.transaction_hash ? 
-          `${process.env.NEXT_PUBLIC_SEPOLIA_EXPLORER}/tx/${row.transaction_hash}` : null
+        somniaExplorerUrl: row.somnia_tx_hash ? 
+          `${somniaExplorer}/tx/${row.somnia_tx_hash}` : null,
+        entropyExplorerUrl: row.entropy_tx_hash ? 
+          `${arbitrumSepoliaExplorer}/tx/${row.entropy_tx_hash}` : null
       }));
 
     } catch (error) {

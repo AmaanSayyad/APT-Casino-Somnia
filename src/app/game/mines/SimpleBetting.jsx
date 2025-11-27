@@ -33,7 +33,7 @@ const SimpleBetting = ({ onSubmit, initialSettings = {} }) => {
               value={betAmount}
             >
               {[10, 25, 50, 100, 250, 500, 1000].map((amount) => (
-                <option key={amount} value={amount}>{amount} MON</option>
+                <option key={amount} value={amount}>{amount} STT</option>
               ))}
             </select>
           </div>

@@ -71,7 +71,7 @@ const BettingPanel = ({
           <span className="text-sm text-gray-300">Balance:</span>
           {isConnected ? (
             <span className="text-sm text-green-300 font-medium">
-              {parseFloat(balance || 0).toFixed(5)} MON
+              {parseFloat(balance || 0).toFixed(5)} STT
             </span>
           ) : (
             <span className="text-sm text-red-300 font-medium">
@@ -145,7 +145,7 @@ const BettingPanel = ({
       <div className="mb-4">
         <div className="flex justify-between p-1 mb-1">
           <label className="text-sm text-white">Bet Amount</label>
-          <div className="text-sm">{betAmount.toFixed(5)} MON</div>
+          <div className="text-sm">{betAmount.toFixed(5)} STT</div>
         </div>
         <div className="flex w-full gradient-border">
         <div className="flex items-center w-[60%]">

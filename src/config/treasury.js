@@ -23,10 +23,10 @@ export const TREASURY_CONFIG = {
     WITHDRAW_LIMIT: process.env.GAS_LIMIT_WITHDRAW ? '0x' + parseInt(process.env.GAS_LIMIT_WITHDRAW).toString(16) : '0x186A0', // 100000 gas for more complex operations
   },
   
-  // Minimum and maximum deposit amounts (in MON)
+  // Minimum and maximum deposit amounts (in STT)
   LIMITS: {
-    MIN_DEPOSIT: parseFloat(process.env.MIN_DEPOSIT) || 0.001, // 0.001 MON minimum
-    MAX_DEPOSIT: parseFloat(process.env.MAX_DEPOSIT) || 100, // 100 MON maximum
+    MIN_DEPOSIT: parseFloat(process.env.MIN_DEPOSIT) || 0.001, // 0.001 STT minimum
+    MAX_DEPOSIT: parseFloat(process.env.MAX_DEPOSIT) || 100, // 100 STT maximum
   }
 };
 
@@ -43,3 +43,4 @@ export const getTreasuryInfo = () => {
     chainId: TREASURY_CONFIG.NETWORK.CHAIN_ID
   };
 };
+

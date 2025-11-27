@@ -4,6 +4,18 @@ import { somniaTestnetConfig } from '@/config/somniaTestnetConfig';
 import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '@/config/contracts';
 import PYTH_ENTROPY_CONFIG from '@/config/pythEntropy.js';
 
+/**
+ * Treasury Balance API - Dual Network
+ * 
+ * NETWORK ARCHITECTURE:
+ * - Treasury operations: Somnia Testnet (STT balance)
+ * - Entropy operations: Arbitrum Sepolia (ETH for entropy fees)
+ * 
+ * This API returns information about both networks to provide
+ * complete visibility into the casino's operational status.
+ * 
+ * Validates: Requirements 12.3
+ */
 export async function GET() {
   try {
     // Use Somnia Testnet for treasury operations
@@ -69,3 +81,4 @@ export async function GET() {
     );
   }
 }
+

@@ -61,17 +61,17 @@ export const bettingTableData = {
 
 export const gameStatistics = {
   totalBets: '956,421',
-      totalVolume: '4.7M MON',
-    avgBetSize: '1.85 MON',
-    maxWin: '1,217.50 MON'
+      totalVolume: '4.7M STT',
+    avgBetSize: '1.85 STT',
+    maxWin: '1,217.50 STT'
 };
 
 export const recentBigWins = [
-      { player: "CryptoMiner", amount: "1,217.50 MON", time: "3m ago", config: "10 mines" },
-    { player: "DiamondHands", amount: "892.50 MON", time: "10m ago", config: "5 mines" },
-    { player: "GemHunter", amount: "653.00 MON", time: "22m ago", config: "3 mines" },
-    { player: "RiskTaker", amount: "437.00 MON", time: "45m ago", config: "3 mines" },
-    { player: "TreasureSeeker", amount: "381.50 MON", time: "1h ago", config: "1 mine" }
+      { player: "CryptoMiner", amount: "1,217.50 STT", time: "3m ago", config: "10 mines" },
+    { player: "DiamondHands", amount: "892.50 STT", time: "10m ago", config: "5 mines" },
+    { player: "GemHunter", amount: "653.00 STT", time: "22m ago", config: "3 mines" },
+    { player: "RiskTaker", amount: "437.00 STT", time: "45m ago", config: "3 mines" },
+    { player: "TreasureSeeker", amount: "381.50 STT", time: "1h ago", config: "1 mine" }
 ];
 
 export const winProbabilities = [
@@ -81,3 +81,4 @@ export const winProbabilities = [
   { config: '10 mines (15 safe tiles)', probability: 60.0, color: 'from-yellow-500 to-yellow-700' },
   { config: '15 mines (10 safe tiles)', probability: 40.0, color: 'from-red-500 to-red-700' }
 ];
+

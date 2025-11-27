@@ -159,3 +159,4 @@ export const useGlobalWalletPersistence = () => {
     isReconnecting: reconnectAttempted.current
   };
 };
+

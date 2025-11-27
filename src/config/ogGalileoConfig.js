@@ -1,6 +1,6 @@
 /**
  * Somnia Testnet Testnet Configuration
- * Configuration for Somnia Testnet testnet with MON token
+ * Configuration for Somnia Testnet testnet with STT token
  */
 
 // Somnia Testnet Chain Configuration
@@ -38,9 +38,9 @@ export const SOMNIA_TESTNET_TESTNET_CONFIG = {
 
 // Somnia Testnet Tokens
 export const SOMNIA_TESTNET_TESTNET_TOKENS = {
-  MON: {
+  STT: {
     symbol: 'STT',
-    name: 'MON token',
+    name: 'STT token',
     decimals: 18,
     address: '0x0000000000000000000000000000000000000000',
     isNative: true,
@@ -52,10 +52,10 @@ export const SOMNIA_TESTNET_TESTNET_TOKENS = {
 // Casino configuration for Somnia Testnet
 export const SOMNIA_TESTNET_TESTNET_CASINO_CONFIG = {
   // Deposit/Withdraw settings
-  minDeposit: '0.001', // 0.001 MON
-  maxDeposit: '100',   // 100 MON
-  minWithdraw: '0.001', // 0.001 MON
-  maxWithdraw: '100',   // 100 MON
+  minDeposit: '0.001', // 0.001 STT
+  maxDeposit: '100',   // 100 STT
+  minWithdraw: '0.001', // 0.001 STT
+  maxWithdraw: '100',   // 100 STT
   
   // Game settings (same as Arbitrum for consistency)
   games: {

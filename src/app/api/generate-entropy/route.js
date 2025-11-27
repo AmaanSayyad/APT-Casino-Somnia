@@ -1,8 +1,20 @@
 import { ethers } from 'ethers';
 
-// Pyth Entropy V2 Contract Configuration for Arbitrum Sepolia
-// IMPORTANT: Entropy generation remains on Arbitrum Sepolia even though
-// game logging and deposits/withdrawals happen on Somnia Testnet
+/**
+ * Pyth Entropy V2 API - Arbitrum Sepolia
+ * 
+ * CRITICAL NETWORK ARCHITECTURE:
+ * ================================
+ * This API MUST remain on Arbitrum Sepolia for entropy generation.
+ * 
+ * Network Separation:
+ * - Entropy/VRF: Arbitrum Sepolia (this API) - Provably fair randomness
+ * - Game Logging: Somnia Testnet - On-chain game result verification
+ * - Deposits/Withdrawals: Somnia Testnet - STT token operations
+ * 
+ * DO NOT migrate this API to Somnia Testnet!
+ * Pyth Entropy is only available on Arbitrum Sepolia.
+ */
 const PYTH_ENTROPY_ADDRESS = process.env.NEXT_PUBLIC_PYTH_ENTROPY_CONTRACT || '0x549ebba8036ab746611b4ffa1423eb0a4df61440';
 const ARBITRUM_SEPOLIA_RPC = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
 const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
@@ -159,3 +171,4 @@ function generateRandomFromTxHash(txHash) {
   const hashNumber = parseInt(txHash.slice(2, 10), 16);
   return hashNumber % 1000000; // Return a number between 0 and 999999
 }
+

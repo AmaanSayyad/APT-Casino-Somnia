@@ -42,3 +42,4 @@ export const somniaTestnetTokens = {
 };
 
 export default somniaTestnetConfig;
+
