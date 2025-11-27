@@ -45,10 +45,18 @@ export function useSomniaStreams({
    * Initialize the Somnia Streams SDK
    */
   const initialize = useCallback(async () => {
-    // Check ref for synchronous state (avoids race conditions)
-    if (isInitializedRef.current || isConnectingRef.current) {
-      console.log('⚠️ Already initialized or initializing...');
-      return isInitializedRef.current;
+    // Check if service is already initialized (handles Fast Refresh)
+    if (somniaStreamsService.sdk !== null) {
+      console.log('✅ SDK already initialized, syncing state...');
+      isInitializedRef.current = true;
+      setIsInitialized(true);
+      return true;
+    }
+    
+    // Check if already in the process of initializing
+    if (isConnectingRef.current) {
+      console.log('⚠️ Already initializing, please wait...');
+      return false;
     }
 
     try {
@@ -62,6 +70,8 @@ export function useSomniaStreams({
       }
       
       console.log('🔧 Initializing Somnia Streams...');
+      console.log('   GameLogger:', gameLoggerAddress);
+      
       await somniaStreamsService.initialize(walletClient, gameLoggerAddress);
       
       // Update both ref and state
@@ -69,7 +79,7 @@ export function useSomniaStreams({
       setIsInitialized(true);
       setError(null);
       
-      console.log('✅ Somnia Streams initialized');
+      console.log('✅ Somnia Streams initialized successfully');
       return true;
     } catch (err) {
       console.error('❌ Failed to initialize Somnia Streams:', err);
@@ -204,21 +214,26 @@ export function useSomniaStreams({
         return;
       }
       
-      // Skip if already connecting or connected
+      // Skip if already connecting
       if (isConnectingRef.current) {
         console.log('⏭️ Already connecting, skipping...');
         return;
       }
       
       try {
-        // Initialize if not already initialized
-        if (!isInitializedRef.current) {
+        // Check BOTH ref AND actual service state (handles Fast Refresh)
+        const sdkActuallyReady = somniaStreamsService.sdk !== null;
+        
+        // Initialize if not actually initialized (service check is source of truth)
+        if (!sdkActuallyReady) {
           console.log('🔄 Starting initialization...');
+          // Reset ref if service was reloaded
+          isInitializedRef.current = false;
+          
           const success = await initialize();
           
           if (!success) {
             console.warn('⚠️ Initialization failed, will retry in 3 seconds...');
-            // Retry initialization after delay
             if (mounted) {
               retryTimeout = setTimeout(() => {
                 if (mounted) initAndSubscribe();
@@ -231,10 +246,16 @@ export function useSomniaStreams({
             console.log('⏭️ Component unmounted during initialization');
             return;
           }
+        } else {
+          // Service already initialized (maybe from another component)
+          isInitializedRef.current = true;
+          if (!isInitialized) {
+            setIsInitialized(true);
+          }
         }
         
         // Subscribe after initialization is confirmed
-        if (isInitializedRef.current && !isConnected && mounted) {
+        if (somniaStreamsService.sdk !== null && !isConnected && mounted) {
           console.log('🔄 Starting subscription...');
           const subscribed = await subscribe();
           
@@ -247,7 +268,6 @@ export function useSomniaStreams({
         }
       } catch (err) {
         console.error('❌ Failed to initialize game notifications:', err);
-        // Retry on error
         if (mounted) {
           retryTimeout = setTimeout(() => {
             if (mounted) initAndSubscribe();
@@ -264,7 +284,7 @@ export function useSomniaStreams({
         clearTimeout(retryTimeout);
       }
     };
-  }, [autoConnect, onGameResult, initialize, subscribe, isConnected]);
+  }, [autoConnect, onGameResult, initialize, subscribe, isConnected, isInitialized]);
 
   /**
    * Cleanup on unmount

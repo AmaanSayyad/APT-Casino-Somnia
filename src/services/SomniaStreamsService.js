@@ -13,6 +13,7 @@ import somniaTestnetConfig from '../config/somniaTestnetConfig.js';
 import {
   SOMNIA_STREAMS_EVENT_SCHEMAS,
   GAME_RESULT_EVENT_SCHEMA,
+  GAME_TYPE_NAMES,
   STREAMS_SUBSCRIPTION_CONFIG
 } from '../config/somniaStreams.js';
 import { fallbackStreamsService } from './SomniaStreamsService.fallback.js';
@@ -302,13 +303,19 @@ export class SomniaStreamsService {
         data
       });
 
+      // Convert gameType from uint8 to string name
+      const gameTypeNum = Number(decoded.args.gameType);
+      const gameTypeName = GAME_TYPE_NAMES[gameTypeNum] || `UNKNOWN_${gameTypeNum}`;
+
       // Extract and format the event arguments
       return {
+        logId: decoded.args.logId,
         player: decoded.args.player,
-        gameType: decoded.args.gameType,
+        gameType: gameTypeName,
         betAmount: decoded.args.betAmount.toString(),
         payout: decoded.args.payout.toString(),
         entropyRequestId: decoded.args.entropyRequestId,
+        entropyTxHash: decoded.args.entropyTxHash,
         timestamp: Number(decoded.args.timestamp)
       };
 

@@ -11,6 +11,7 @@ import { createPublicClient, http, decodeEventLog } from 'viem';
 import somniaTestnetConfig from '../config/somniaTestnetConfig.js';
 import {
   GAME_RESULT_EVENT_SCHEMA,
+  GAME_TYPE_NAMES,
   STREAMS_SUBSCRIPTION_CONFIG
 } from '../config/somniaStreams.js';
 
@@ -101,9 +102,16 @@ export class FallbackStreamsService {
     try {
       const currentBlock = await this.publicClient.getBlockNumber();
       
+      // Log every poll for debugging
+      console.log(`🔍 Polling: current block ${currentBlock}, last processed ${this.lastProcessedBlock}`);
+      
       if (currentBlock <= this.lastProcessedBlock) {
         return; // No new blocks
       }
+
+      const blocksToCheck = currentBlock - this.lastProcessedBlock;
+      console.log(`📦 Checking ${blocksToCheck} new blocks for GameResultLogged events...`);
+      console.log(`   Contract: ${this.gameLoggerAddress}`);
 
       // Get logs from last processed block to current block
       const logs = await this.publicClient.getLogs({
@@ -121,16 +129,26 @@ export class FallbackStreamsService {
         toBlock: currentBlock
       });
 
+      console.log(`📡 Polling found ${logs.length} events in blocks ${this.lastProcessedBlock + 1n} to ${currentBlock}`);
+
       // Process each log
       for (const log of logs) {
         try {
+          // Convert gameType from uint8 to string name
+          const gameTypeNum = Number(log.args.gameType);
+          const gameTypeName = GAME_TYPE_NAMES[gameTypeNum] || `UNKNOWN_${gameTypeNum}`;
+          
           const parsedEvent = {
+            logId: log.args.logId,
             player: log.args.player,
-            gameType: log.args.gameType,
+            gameType: gameTypeName,
             betAmount: log.args.betAmount.toString(),
             payout: log.args.payout.toString(),
             entropyRequestId: log.args.entropyRequestId,
-            timestamp: Number(log.args.timestamp)
+            entropyTxHash: log.args.entropyTxHash,
+            timestamp: Number(log.args.timestamp),
+            transactionHash: log.transactionHash,
+            blockNumber: Number(log.blockNumber)
           };
 
           console.log('📬 Game result event (polling):', parsedEvent);
@@ -144,7 +162,7 @@ export class FallbackStreamsService {
             }
           });
         } catch (error) {
-          console.error('❌ Error processing log:', error);
+          console.error('❌ Error processing log:', error, log);
         }
       }
 

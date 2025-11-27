@@ -287,7 +287,13 @@ export function GlobalNotificationSystem() {
    * Handle incoming game result events
    */
   const handleGameResult = useCallback((gameResult) => {
-    console.log('📬 New game result notification:', gameResult);
+    console.log('🎰 New game result notification received:', {
+      player: gameResult.player,
+      gameType: gameResult.gameType,
+      betAmount: gameResult.betAmount,
+      payout: gameResult.payout,
+      timestamp: gameResult.timestamp
+    });
     
     // Create notification object
     const notification = {
@@ -297,13 +303,18 @@ export function GlobalNotificationSystem() {
       betAmount: gameResult.betAmount,
       payout: gameResult.payout,
       timestamp: gameResult.timestamp,
-      entropyRequestId: gameResult.entropyRequestId
+      entropyRequestId: gameResult.entropyRequestId,
+      logId: gameResult.logId,
+      transactionHash: gameResult.transactionHash
     };
+    
+    console.log('📢 Adding notification to queue:', notification.id);
     
     // Add to notification queue
     setNotifications(prev => {
       // Limit queue to 5 notifications
       const newNotifications = [notification, ...prev].slice(0, 5);
+      console.log('📋 Notification queue size:', newNotifications.length);
       return newNotifications;
     });
   }, []);
