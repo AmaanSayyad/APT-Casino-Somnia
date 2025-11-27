@@ -15,6 +15,7 @@ import {
   GAME_RESULT_EVENT_SCHEMA,
   STREAMS_SUBSCRIPTION_CONFIG
 } from '../config/somniaStreams.js';
+import { fallbackStreamsService } from './SomniaStreamsService.fallback.js';
 
 /**
  * SomniaStreamsService Class
@@ -36,6 +37,8 @@ export class SomniaStreamsService {
     this.reconnectTimeout = null;
     this.eventCallbacks = [];
     this.errorCallbacks = [];
+    this.useFallback = false;
+    this.gameLoggerAddress = null;
     
     console.log('🔧 SomniaStreamsService initialized');
   }
@@ -45,29 +48,63 @@ export class SomniaStreamsService {
    * @param {Object} walletClient - Optional wallet client for authenticated operations
    * @returns {Promise<void>}
    */
-  async initialize(walletClient = null) {
+  async initialize(walletClient = null, gameLoggerAddress = null) {
     try {
-      // Create public client with WebSocket transport for subscriptions
-      const publicClient = createPublicClient({
-        chain: somniaTestnetConfig,
-        transport: webSocket(somniaTestnetConfig.rpcUrls.default.webSocket[0])
-      });
-
-      // Initialize SDK
-      const clientConfig = {
-        public: publicClient
-      };
-
-      if (walletClient) {
-        clientConfig.wallet = walletClient;
-      }
-
-      this.sdk = new SDK(clientConfig);
+      console.log('🔧 Initializing Somnia Streams SDK...');
+      console.log(`   WebSocket URL: ${somniaTestnetConfig.rpcUrls.default.webSocket[0]}`);
       
-      console.log('✅ Somnia Streams SDK initialized with WebSocket transport');
+      this.gameLoggerAddress = gameLoggerAddress;
+      
+      // Try WebSocket first
+      try {
+        // Create public client with WebSocket transport for subscriptions
+        const publicClient = createPublicClient({
+          chain: somniaTestnetConfig,
+          transport: webSocket(somniaTestnetConfig.rpcUrls.default.webSocket[0], {
+            timeout: 10000, // 10 second timeout
+            retryCount: 2,
+            retryDelay: 1000
+          })
+        });
+
+        // Test the WebSocket connection
+        const chainId = await publicClient.getChainId();
+        console.log(`✅ WebSocket connection established (Chain ID: ${chainId})`);
+
+        // Initialize SDK
+        const clientConfig = {
+          public: publicClient
+        };
+
+        if (walletClient) {
+          clientConfig.wallet = walletClient;
+        }
+
+        this.sdk = new SDK(clientConfig);
+        this.useFallback = false;
+        
+        console.log('✅ Somnia Streams SDK initialized with WebSocket transport');
+      } catch (wsError) {
+        console.warn('⚠️ WebSocket connection failed, switching to HTTP polling fallback');
+        console.warn(`   Error: ${wsError.message}`);
+        
+        // Initialize fallback service
+        if (!gameLoggerAddress) {
+          console.error('❌ GameLogger address is required for fallback mode');
+          console.error('   Please provide gameLoggerAddress parameter to initialize()');
+          throw new Error('GameLogger address required for fallback mode. Check NEXT_PUBLIC_SOMNIA_GAME_LOGGER_ADDRESS in .env');
+        }
+        
+        await fallbackStreamsService.initialize(gameLoggerAddress);
+        this.useFallback = true;
+        this.sdk = { _fallback: true }; // Dummy SDK object to pass initialization check
+        
+        console.log('✅ Fallback Streams Service initialized (HTTP Polling Mode)');
+        console.log(`   GameLogger Address: ${gameLoggerAddress}`);
+      }
     } catch (error) {
-      console.error('❌ Failed to initialize Somnia Streams SDK:', error);
-      throw new Error(`SDK initialization failed: ${error.message}`);
+      console.error('❌ Failed to initialize Somnia Streams:', error);
+      throw new Error(`Initialization failed: ${error.message}`);
     }
   }
 
@@ -92,9 +129,26 @@ export class SomniaStreamsService {
         this.errorCallbacks.push(onError);
       }
 
+      // Use fallback if WebSocket is not available
+      if (this.useFallback) {
+        console.log('📡 Starting fallback polling for GameResultLogged events...');
+        
+        await fallbackStreamsService.startPolling(onGameResult, onError, 5000);
+        
+        this.isConnected = true;
+        this.subscriptionId = 'fallback-polling';
+        
+        console.log('✅ Fallback polling started successfully');
+        
+        return {
+          subscriptionId: this.subscriptionId,
+          unsubscribe: () => this.unsubscribe()
+        };
+      }
+
       console.log('📡 Subscribing to GameResultLogged events...');
 
-      // Subscribe to the event
+      // Subscribe to the event via WebSocket
       const subscription = await this.sdk.streams.subscribe({
         somniaStreamsEventId: SOMNIA_STREAMS_EVENT_SCHEMAS.GAME_RESULT_LOGGED,
         ethCalls: [], // No additional ETH calls needed
@@ -109,7 +163,7 @@ export class SomniaStreamsService {
       });
 
       if (!subscription) {
-        throw new Error('Failed to create subscription');
+        throw new Error('Failed to create subscription - SDK returned undefined. This usually means the WebSocket transport is not properly configured or the schema ID is invalid. Check browser console for SDK errors.');
       }
 
       this.subscription = subscription;
@@ -334,7 +388,10 @@ export class SomniaStreamsService {
         this.reconnectTimeout = null;
       }
 
-      if (this.subscription && this.subscription.unsubscribe) {
+      if (this.useFallback) {
+        fallbackStreamsService.stopPolling();
+        console.log('✅ Stopped fallback polling');
+      } else if (this.subscription && this.subscription.unsubscribe) {
         await this.subscription.unsubscribe();
         console.log('✅ Unsubscribed from GameResultLogged events');
       }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
-import { switchToSomnia TestnetTestnet, isSomnia TestnetTestnet, SOMNIA_TESTNET_TESTNET_CONFIG } from '@/utils/networkUtils';
+import { switchToSomniaTestnet, isSomniaTestnet, SOMNIA_TESTNET_CONFIG } from '@/utils/networkUtils';
 
 const NetworkSwitcher = () => {
   const { isConnected } = useAccount();
@@ -13,7 +13,7 @@ const NetworkSwitcher = () => {
 
   useEffect(() => {
     if (isConnected && chainId) {
-      setIsWrongNetwork(!isSomnia TestnetTestnet(chainId));
+      setIsWrongNetwork(!isSomniaTestnet(chainId));
     }
   }, [isConnected, chainId]);
 
@@ -29,11 +29,11 @@ const NetworkSwitcher = () => {
         } catch (wagmiError) {
           console.log('Wagmi switch failed, trying manual method:', wagmiError);
           // If wagmi fails, try manual MetaMask method
-          await switchToSomnia TestnetTestnet();
+          await switchToSomniaTestnet();
         }
       } else {
         // Fallback to manual method
-        await switchToSomnia TestnetTestnet();
+        await switchToSomniaTestnet();
       }
     } catch (error) {
       console.error('Failed to switch network:', error);

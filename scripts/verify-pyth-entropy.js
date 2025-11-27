@@ -14,7 +14,7 @@ const ARBITRUM_SEPOLIA_CHAIN_ID = 421614;
 const ARBITRUM_SEPOLIA_RPC = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
 const ARBITRUM_SEPOLIA_EXPLORER = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_EXPLORER || 'https://sepolia.arbiscan.io';
 const PYTH_ENTROPY_CONTRACT = process.env.NEXT_PUBLIC_PYTH_ENTROPY_CONTRACT || '0x549ebba8036ab746611b4ffa1423eb0a4df61440';
-const SOMNIA_TESTNET_CHAIN_ID = 50311;
+const SOMNIA_TESTNET_CHAIN_ID = 50312;
 
 // Game types
 const GAME_TYPES = {
@@ -240,7 +240,7 @@ async function verifySomniaIsolation() {
     const somniaReferences = [
       'somnia',
       'SOMNIA',
-      '50311', // Somnia chain ID
+      '50312', // Somnia chain ID
       'dream-rpc.somnia.network'
     ];
     

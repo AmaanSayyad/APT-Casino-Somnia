@@ -1,8 +1,8 @@
 // Network utilities for Somnia Testnet
-import { somnia-testnetTestnet } from '@/config/chains';
+import { somniaTestnet } from '@/config/chains';
 
-export const SOMNIA_TESTNET_TESTNET_CONFIG = {
-  chainId: '0xc488', // 10143 in hex
+export const SOMNIA_TESTNET_CONFIG = {
+  chainId: '0xc488', // 50312 in hex
   chainName: 'Somnia Testnet',
   nativeCurrency: {
     name: 'Somnia Testnet',
@@ -13,7 +13,7 @@ export const SOMNIA_TESTNET_TESTNET_CONFIG = {
   blockExplorerUrls: ['https://shannon-explorer.somnia.network'],
 };
 
-export const switchToSomnia TestnetTestnet = async () => {
+export const switchToSomniaTestnet = async () => {
   if (!window.ethereum) {
     throw new Error('MetaMask is not installed');
   }
@@ -22,7 +22,7 @@ export const switchToSomnia TestnetTestnet = async () => {
     // Try to switch to Somnia Testnet
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: SOMNIA_TESTNET_TESTNET_CONFIG.chainId }],
+      params: [{ chainId: SOMNIA_TESTNET_CONFIG.chainId }],
     });
   } catch (switchError) {
     // If the chain is not added, add it
@@ -30,7 +30,7 @@ export const switchToSomnia TestnetTestnet = async () => {
       try {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
-          params: [SOMNIA_TESTNET_TESTNET_CONFIG],
+          params: [SOMNIA_TESTNET_CONFIG],
         });
       } catch (addError) {
         throw new Error('Failed to add Somnia Testnet to MetaMask');
@@ -41,7 +41,7 @@ export const switchToSomnia TestnetTestnet = async () => {
   }
 };
 
-export const isSomnia TestnetTestnet = (chainId) => {
+export const isSomniaTestnet = (chainId) => {
   return chainId === 50312 || chainId === '0xc488';
 };
 
@@ -50,6 +50,6 @@ export const formatMonBalance = (balance, decimals = 5) => {
   return `${numBalance.toFixed(decimals)} STT`;
 };
 
-export const getSomnia TestnetTestnetExplorerUrl = (txHash) => {
+export const getSomniaTestnetExplorerUrl = (txHash) => {
   return `https://shannon-explorer.somnia.network/tx/${txHash}`;
 };

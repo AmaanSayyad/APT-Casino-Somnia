@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { somniaStreamsService } from '../services/SomniaStreamsService';
 import { useWalletClient } from 'wagmi';
+import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '../config/contracts';
 
 /**
  * useSomniaStreams Hook
@@ -44,22 +45,34 @@ export function useSomniaStreams({
    */
   const initialize = useCallback(async () => {
     if (isInitialized || isConnectingRef.current) {
-      return;
+      console.log('⚠️ Already initialized or initializing...');
+      return isInitialized;
     }
 
     try {
       isConnectingRef.current = true;
       console.log('🔧 Initializing Somnia Streams...');
       
-      await somniaStreamsService.initialize(walletClient);
+      // Get GameLogger address from config
+      const gameLoggerAddress = SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET]?.gameLogger;
+      
+      if (!gameLoggerAddress) {
+        throw new Error('GameLogger address not found in config. Check NEXT_PUBLIC_SOMNIA_GAME_LOGGER_ADDRESS in .env');
+      }
+      
+      console.log(`   GameLogger Address: ${gameLoggerAddress}`);
+      
+      await somniaStreamsService.initialize(walletClient, gameLoggerAddress);
       setIsInitialized(true);
       setError(null);
       
       console.log('✅ Somnia Streams initialized');
+      return true;
     } catch (err) {
       console.error('❌ Failed to initialize Somnia Streams:', err);
       setError(err);
       setIsInitialized(false);
+      return false;
     } finally {
       isConnectingRef.current = false;
     }
@@ -69,9 +82,12 @@ export function useSomniaStreams({
    * Subscribe to game result events
    */
   const subscribe = useCallback(async () => {
-    if (!isInitialized) {
-      console.warn('⚠️ Cannot subscribe: SDK not initialized');
-      return;
+    // Check if SDK is initialized
+    const sdkInitialized = somniaStreamsService.sdk !== null;
+    
+    if (!sdkInitialized) {
+      console.error('❌ Cannot subscribe: SDK not initialized. Call initialize() first.');
+      throw new Error('SDK not initialized. Call initialize() first.');
     }
 
     if (isConnected) {
@@ -108,8 +124,9 @@ export function useSomniaStreams({
       console.error('❌ Failed to subscribe:', err);
       setError(err);
       setIsConnected(false);
+      throw err;
     }
-  }, [isInitialized, isConnected, onGameResult, onError]);
+  }, [isConnected, onGameResult, onError]);
 
   /**
    * Unsubscribe from events
@@ -175,19 +192,36 @@ export function useSomniaStreams({
    * Auto-connect on mount if enabled
    */
   useEffect(() => {
-    if (autoConnect && !isInitialized && !isConnectingRef.current) {
-      initialize();
-    }
-  }, [autoConnect, isInitialized, initialize]);
-
-  /**
-   * Auto-subscribe after initialization
-   */
-  useEffect(() => {
-    if (autoConnect && isInitialized && !isConnected && onGameResult) {
-      subscribe();
-    }
-  }, [autoConnect, isInitialized, isConnected, onGameResult, subscribe]);
+    let mounted = true;
+    
+    const initAndSubscribe = async () => {
+      if (!autoConnect || !onGameResult) return;
+      if (isConnectingRef.current || isConnected) return;
+      
+      try {
+        // Initialize if not already initialized
+        if (!isInitialized) {
+          console.log('🔧 Auto-initializing Somnia Streams...');
+          const success = await initialize();
+          if (!success || !mounted) return;
+        }
+        
+        // Subscribe after initialization
+        if (!isConnected && mounted) {
+          console.log('📡 Auto-subscribing to game results...');
+          await subscribe();
+        }
+      } catch (err) {
+        console.error('❌ Auto-connect failed:', err);
+      }
+    };
+    
+    initAndSubscribe();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [autoConnect, onGameResult]); // Sadece autoConnect ve onGameResult'a bağlı
 
   /**
    * Cleanup on unmount
