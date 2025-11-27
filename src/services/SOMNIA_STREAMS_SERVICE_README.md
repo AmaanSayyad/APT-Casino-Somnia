@@ -349,7 +349,7 @@ function LiveActivityFeed() {
 
 ## Related Documentation
 
-- [Somnia Data Streams Integration Guide](../../docs/SOMNIA_STREAMS_INTEGRATION.md)
+- [Somnia Data Streams Integration Guide](../../README.md#-somnia-data-streams-integration-hackathon-focus)
 - [Game Logger Integration](./GAME_LOGGER_README.md)
 - [Somnia Testnet Configuration](../config/somniaTestnetConfig.js)
 
