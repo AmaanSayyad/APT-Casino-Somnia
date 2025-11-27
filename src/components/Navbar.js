@@ -21,6 +21,11 @@ import { useGlobalWalletPersistence } from '../hooks/useGlobalWalletPersistence'
 import { useNotification } from './NotificationSystem';
 import { SOMNIA_CONTRACTS, SOMNIA_NETWORKS } from '../config/contracts';
 import { somniaTestnetConfig } from '../config/somniaTestnetConfig';
+
+// Treasury configuration
+const TREASURY_CONFIG = {
+  ADDRESS: SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET].treasury
+};
 // Enhanced UserBalanceSystem with deposit functionality
 const UserBalanceSystem = {
   getBalance: async (address) => {

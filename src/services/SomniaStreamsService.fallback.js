@@ -26,8 +26,6 @@ export class FallbackStreamsService {
     this.eventCallbacks = [];
     this.errorCallbacks = [];
     this.gameLoggerAddress = null;
-    
-    console.log('🔧 FallbackStreamsService initialized (HTTP Polling Mode)');
   }
 
   /**
@@ -35,8 +33,6 @@ export class FallbackStreamsService {
    */
   async initialize(gameLoggerAddress) {
     try {
-      console.log('🔧 Initializing Fallback Streams Service...');
-      
       this.publicClient = createPublicClient({
         chain: somniaTestnetConfig,
         transport: http(somniaTestnetConfig.rpcUrls.default.http[0])
@@ -47,12 +43,9 @@ export class FallbackStreamsService {
       // Get current block number
       this.lastProcessedBlock = await this.publicClient.getBlockNumber();
       
-      console.log('✅ Fallback Streams Service initialized');
-      console.log(`   Starting from block: ${this.lastProcessedBlock}`);
-      
       return true;
     } catch (error) {
-      console.error('❌ Failed to initialize Fallback Streams Service:', error);
+      console.error('❌ Failed to initialize HTTP polling:', error);
       throw error;
     }
   }
@@ -80,7 +73,6 @@ export class FallbackStreamsService {
     }
 
     this.isPolling = true;
-    console.log(`📡 Starting event polling (interval: ${intervalMs}ms)...`);
 
     // Start polling
     this.pollingInterval = setInterval(async () => {
@@ -172,7 +164,6 @@ export class FallbackStreamsService {
       this.pollingInterval = null;
     }
     this.isPolling = false;
-    console.log('🔌 Stopped event polling');
   }
 
   /**

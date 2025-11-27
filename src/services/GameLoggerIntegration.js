@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 
 /**
  * Log game result after game completion
+ * Uses backend API with Treasury wallet for authorization
  * @param {Object} params - Game logging parameters
  * @returns {Promise<string|null>} Transaction hash or null if logging fails
  */
@@ -28,31 +29,41 @@ export async function logGameToSomnia({
       return null;
     }
 
-    // Initialize logger with provider and signer if not already done
-    if (provider && signer) {
-      somniaGameLogger.setProviderAndSigner(provider, signer);
+    console.log('📝 Logging game via backend API...');
+
+    // Call backend API to log game with Treasury wallet
+    const response = await fetch('/api/log-game', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        gameType,
+        playerAddress,
+        betAmount: betAmount.toString(),
+        result,
+        payout: payout.toString(),
+        entropyProof: entropyProof || {
+          requestId: ethers.ZeroHash,
+          transactionHash: ''
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to log game');
     }
 
-    // Log the game result
-    const txHash = await somniaGameLogger.logGameResult({
-      gameType,
-      playerAddress,
-      betAmount,
-      result,
-      payout,
-      entropyProof: entropyProof || {
-        requestId: ethers.ZeroHash,
-        transactionHash: ''
-      }
-    });
+    const data = await response.json();
 
     console.log('✅ Game logged to Somnia:', {
       gameType,
-      txHash,
-      explorerUrl: somniaGameLogger.getTransactionUrl(txHash)
+      txHash: data.txHash,
+      explorerUrl: data.explorerUrl
     });
 
-    return txHash;
+    return data.txHash;
 
   } catch (error) {
     console.error('❌ Failed to log game to Somnia:', error);
