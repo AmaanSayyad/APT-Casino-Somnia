@@ -4,8 +4,19 @@ import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
 import { useSelector } from 'react-redux';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import pythEntropyService from '@/services/PythEntropyService';
+import { CircularProgress } from "@mui/material";
 
-export default function GameControls({ onBet, onRowChange, onRiskLevelChange, onBetAmountChange, initialRows = 16, initialRiskLevel = "Medium" }) {
+export default function GameControls({ 
+  onBet, 
+  onRowChange, 
+  onRiskLevelChange, 
+  onBetAmountChange, 
+  initialRows = 16, 
+  initialRiskLevel = "Medium",
+  zetaChainEnabled = false,
+  isZetaChainLogging = false,
+  zetaChainError = null
+}) {
   const userBalance = useSelector((state) => state.balance.userBalance);
   const { isConnected } = useWalletStatus();
   
@@ -594,6 +605,32 @@ export default function GameControls({ onBet, onRowChange, onRiskLevelChange, on
                 ? `Insufficient balance STT each` 
                 : `Insufficient balance STT bet`
               }
+            </div>
+          )}
+          
+          {/* ZetaChain logging status indicator */}
+          {zetaChainEnabled && (
+            <div className="mt-3 p-3 bg-[#2A0025] rounded-lg border border-[#333947]">
+              {isZetaChainLogging ? (
+                <div className="flex items-center justify-center gap-2">
+                  <CircularProgress size={16} sx={{ color: '#a855f7' }} />
+                  <span className="text-sm text-purple-400">
+                    Logging to ZetaChain...
+                  </span>
+                </div>
+              ) : zetaChainError ? (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-sm text-red-400">
+                    ⚠️ ZetaChain: {zetaChainError}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-sm text-green-400">
+                    ✓ ZetaChain logging enabled
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
