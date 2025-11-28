@@ -133,7 +133,7 @@ export default function Home() {
     }
 
     // Generate Pyth Entropy in background for provably fair proof
-  const generateEntropyInBackground = async (historyItemId, winAmount, actualMultiplier) => {
+  const generateEntropyInBackground = async (historyItemId, winAmount, actualMultiplier, currentZetaEnabled, currentAddress, currentIsConnected) => {
     try {
       console.log('🔮 PYTH ENTROPY: Generating background entropy for Wheel game...');
       
@@ -194,7 +194,9 @@ export default function Home() {
       });
       
       // Log game result to ZetaChain via backend API (optional, non-blocking)
+      console.log('🔍 ZetaChain enabled status:', zetaChainEnabled, 'Address:', address, 'Connected:', isConnected);
       if (zetaChainEnabled) {
+        console.log('🚀 Starting ZetaChain logging...');
         setIsZetaChainLogging(true);
         setZetaChainError(null);
         
@@ -228,12 +230,22 @@ export default function Home() {
         .then(data => {
           if (data.success && data.txHash) {
             console.log('✅ Wheel game logged to ZetaChain:', data.explorerUrl);
+            console.log('🔍 Updating history item with ID:', historyItemId, 'with txHash:', data.txHash);
             // Update game history with ZetaChain transaction hash
-            setGameHistory(prev => prev.map(item => 
-              item.id === historyItemId 
-                ? { ...item, zetachainTxHash: data.txHash }
-                : item
-            ));
+            setGameHistory(prev => {
+              console.log('📋 Current history before update:', prev);
+              const updated = prev.map(item => {
+                if (item.id === historyItemId) {
+                  console.log('✏️ Found matching item, updating with zetachainTxHash:', data.txHash);
+                  return { ...item, zetachainTxHash: data.txHash };
+                }
+                return item;
+              });
+              console.log('📋 Updated history:', updated);
+              return updated;
+            });
+          } else {
+            console.warn('⚠️ ZetaChain response missing success or txHash:', data);
           }
           setIsZetaChainLogging(false);
         })
@@ -330,9 +342,9 @@ export default function Home() {
             id: Date.now(),
             game: 'Wheel',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            betAmount: betAmount.toFixed(5),
+            betAmount: betAmount,
             multiplier: `${actualMultiplier.toFixed(2)}x`,
-            payout: winAmount.toFixed(5),
+            payout: winAmount,
             result: 0,
             color: detectedColor
           };
@@ -350,6 +362,7 @@ export default function Home() {
             source: 'Generating...'
           };
 
+          // Add to history first
           setGameHistory(prev => [newHistoryItem, ...prev]);
           
           setIsSpinning(false);
@@ -375,9 +388,12 @@ export default function Home() {
           }
 
           // Generate Pyth Entropy in background for provably fair proof
-          generateEntropyInBackground(newHistoryItem.id, winAmount, actualMultiplier).catch(error => {
-            console.error('❌ Background entropy generation failed:', error);
-          });
+          // Use setTimeout to ensure state has updated
+          setTimeout(() => {
+            generateEntropyInBackground(newHistoryItem.id, winAmount, actualMultiplier).catch(error => {
+              console.error('❌ Background entropy generation failed:', error);
+            });
+          }, 100);
           
           // Clean up callback
           window.wheelBetCallback = null;

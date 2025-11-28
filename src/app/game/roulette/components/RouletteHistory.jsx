@@ -265,6 +265,14 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
       window.open(entropyExplorerUrl, '_blank');
     }
   };
+
+  // Open ZetaChain Explorer link
+  const openZetaChainExplorer = (txHash) => {
+    if (txHash && txHash !== 'unknown') {
+      const zetaExplorerUrl = `https://testnet.zetascan.com/tx/${txHash}`;
+      window.open(zetaExplorerUrl, '_blank');
+    }
+  };
   
   return (
     <Paper
@@ -518,14 +526,14 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          {bet.entropyProof || bet.somniaTxHash ? (
+                          {bet.entropyProof || bet.somniaTxHash || bet.zetachainTxHash ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
                               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, alignItems: 'center' }}>
                                 <Typography variant="caption" sx={{ color: '#FFC107', fontFamily: 'monospace', fontWeight: 'bold' }}>
                                   {bet.entropyProof?.sequenceNumber && bet.entropyProof.sequenceNumber !== '0' ? String(bet.entropyProof.sequenceNumber) : ''}
                                 </Typography>
                               </Box>
-                              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', justifyContent: 'center' }}>
                                 {bet.somniaTxHash && (
                                   <Box
                                     onClick={() => openSomniaTestnetExplorer(bet.somniaTxHash)}
@@ -544,6 +552,7 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                         transform: 'scale(1.05)'
                                       }
                                     }}
+                                    title="View on Somnia Testnet Explorer"
                                   >
                                     <FaExternalLinkAlt size={10} color="#8B2398" />
                                     <Typography variant="caption" sx={{ color: '#8B2398', fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -569,6 +578,7 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                         transform: 'scale(1.05)'
                                       }
                                     }}
+                                    title="View on Arbitrum Sepolia Explorer"
                                   >
                                     <FaExternalLinkAlt size={10} color="#0096FF" />
                                     <Typography variant="caption" sx={{ color: '#0096FF', fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -594,10 +604,56 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                         transform: 'scale(1.05)'
                                       }
                                     }}
+                                    title="View on Pyth Entropy Explorer"
                                   >
                                     <FaExternalLinkAlt size={10} color="#681DDB" />
                                     <Typography variant="caption" sx={{ color: '#681DDB', fontSize: '0.7rem', fontWeight: 'bold' }}>
                                       Entropy
+                                    </Typography>
+                                  </Box>
+                                )}
+                                {bet.zetachainTxHash && bet.zetachainTxHash !== 'pending' && (
+                                  <Box
+                                    onClick={() => openZetaChainExplorer(bet.zetachainTxHash)}
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                      cursor: 'pointer',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      backgroundColor: 'rgba(0, 255, 135, 0.1)',
+                                      border: '1px solid rgba(0, 255, 135, 0.3)',
+                                      transition: 'all 0.2s ease',
+                                      '&:hover': {
+                                        backgroundColor: 'rgba(0, 255, 135, 0.2)',
+                                        transform: 'scale(1.05)'
+                                      }
+                                    }}
+                                    title="View on ZetaChain Universal Explorer"
+                                  >
+                                    <FaExternalLinkAlt size={10} color="#00FF87" />
+                                    <Typography variant="caption" sx={{ color: '#00FF87', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                      ZetaChain
+                                    </Typography>
+                                  </Box>
+                                )}
+                                {bet.zetachainTxHash === 'pending' && (
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                      border: '1px solid rgba(255, 193, 7, 0.3)',
+                                    }}
+                                    title="ZetaChain transaction pending"
+                                  >
+                                    <CircularProgress size={10} sx={{ color: '#FFC107' }} />
+                                    <Typography variant="caption" sx={{ color: '#FFC107', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                      ZetaChain
                                     </Typography>
                                   </Box>
                                 )}

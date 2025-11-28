@@ -26,6 +26,14 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
       window.open(entropyExplorerUrl, '_blank');
     }
   };
+
+  // Open ZetaChain Explorer link
+  const openZetaChainExplorer = (txHash) => {
+    if (txHash && txHash !== 'unknown') {
+      const zetaExplorerUrl = `https://testnet.zetascan.com/tx/${txHash}`;
+      window.open(zetaExplorerUrl, '_blank');
+    }
+  };
   
   // Default user stats if none provided
   const defaultStats = {
@@ -308,16 +316,17 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
                 <span>{game.time}</span>
               </div>
               <div className="text-white/70 flex items-center justify-center">
-                {game.entropyProof ? (
+                {game.entropyProof || game.somniaTxHash || game.zetachainTxHash ? (
                   <div className="flex flex-col gap-1 items-center">
                     <div className="text-xs text-gray-300 font-mono text-center">
-                      <div className="text-yellow-400 font-bold">{game.entropyProof.sequenceNumber && game.entropyProof.sequenceNumber !== '0' ? String(game.entropyProof.sequenceNumber) : ''}</div>
+                      <div className="text-yellow-400 font-bold">{game.entropyProof?.sequenceNumber && game.entropyProof.sequenceNumber !== '0' ? String(game.entropyProof.sequenceNumber) : ''}</div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-wrap justify-center">
                       {game.somniaTxHash && (
                         <button
                           onClick={() => openSomniaTestnetExplorer(game.somniaTxHash)}
                           className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
+                          title="View on Somnia Testnet Explorer"
                         >
                           <FaExternalLinkAlt size={8} />
                           Somnia
@@ -327,10 +336,30 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
                         <button
                           onClick={() => openEntropyExplorer(game.entropyProof.transactionHash)}
                           className="flex items-center gap-1 px-2 py-1 bg-[#681DDB]/10 border border-[#681DDB]/30 rounded text-[#681DDB] text-xs hover:bg-[#681DDB]/20 transition-colors"
+                          title="View on Pyth Entropy Explorer"
                         >
                           <FaExternalLinkAlt size={8} />
                           Entropy
                         </button>
+                      )}
+                      {game.zetachainTxHash && game.zetachainTxHash !== 'pending' && (
+                        <button
+                          onClick={() => openZetaChainExplorer(game.zetachainTxHash)}
+                          className="flex items-center gap-1 px-2 py-1 bg-[#00FF87]/10 border border-[#00FF87]/30 rounded text-[#00FF87] text-xs hover:bg-[#00FF87]/20 transition-colors"
+                          title="View on ZetaChain Universal Explorer"
+                        >
+                          <FaExternalLinkAlt size={8} />
+                          ZetaChain
+                        </button>
+                      )}
+                      {game.zetachainTxHash === 'pending' && (
+                        <div
+                          className="flex items-center gap-1 px-2 py-1 bg-[#FFC107]/10 border border-[#FFC107]/30 rounded text-[#FFC107] text-xs"
+                          title="ZetaChain transaction pending"
+                        >
+                          <div className="w-3 h-3 border-2 border-[#FFC107] border-t-transparent rounded-full animate-spin"></div>
+                          ZetaChain
+                        </div>
                       )}
                     </div>
                   </div>

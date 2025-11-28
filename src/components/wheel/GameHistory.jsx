@@ -33,6 +33,22 @@ const GameHistory = ({ gameHistory }) => {
       window.open(explorerUrl, '_blank');
     }
   };
+
+  // Open Somnia Testnet Explorer link
+  const openSomniaTestnetExplorer = (txHash) => {
+    if (txHash && txHash !== 'unknown') {
+      const somniaExplorerUrl = `https://shannon-explorer.somnia.network/tx/${txHash}`;
+      window.open(somniaExplorerUrl, '_blank');
+    }
+  };
+
+  // Open ZetaChain Explorer link
+  const openZetaChainExplorer = (txHash) => {
+    if (txHash && txHash !== 'unknown') {
+      const zetaExplorerUrl = `https://testnet.zetascan.com/tx/${txHash}`;
+      window.open(zetaExplorerUrl, '_blank');
+    }
+  };
   
   return (
     <div className="bg-[#070005] w-full rounded-xl overflow-hidden mt-0">
@@ -128,27 +144,58 @@ const GameHistory = ({ gameHistory }) => {
                       </span>
                     </td>
                     <td className="py-6 px-4">
-                      {item.entropyProof ? (
+                      {item.entropyProof || item.somniaTxHash || item.zetachainTxHash ? (
                         <div className="text-xs text-gray-300 font-mono">
-                          <div className="text-yellow-400 font-bold">{item.entropyProof.sequenceNumber && item.entropyProof.sequenceNumber !== '0' ? String(item.entropyProof.sequenceNumber) : ''}</div>
-                          <div className="flex gap-1 mt-1">
-                            {item.entropyProof.arbiscanUrl && (
+                          <div className="text-yellow-400 font-bold">{item.entropyProof?.sequenceNumber && item.entropyProof.sequenceNumber !== '0' ? String(item.entropyProof.sequenceNumber) : ''}</div>
+                          <div className="flex gap-1 mt-1 flex-wrap">
+                            {item.somniaTxHash && (
+                              <button
+                                onClick={() => openSomniaTestnetExplorer(item.somniaTxHash)}
+                                className="flex items-center gap-1 px-2 py-1 bg-[#8B2398]/10 border border-[#8B2398]/30 rounded text-[#8B2398] text-xs hover:bg-[#8B2398]/20 transition-colors"
+                                title="View on Somnia Testnet Explorer"
+                              >
+                                <FaExternalLinkAlt size={8} />
+                                Somnia
+                              </button>
+                            )}
+                            {item.entropyProof?.arbiscanUrl && (
                               <button
                                 onClick={() => window.open(item.entropyProof.arbiscanUrl, '_blank')}
                                 className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 border border-blue-500/30 rounded text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+                                title="View on Arbitrum Sepolia Explorer"
                               >
                                 <FaExternalLinkAlt size={8} />
                                 Arbiscan
                               </button>
                             )}
-                            {item.entropyProof.transactionHash && (
+                            {item.entropyProof?.transactionHash && (
                               <button
                                 onClick={() => window.open(`https://entropy-explorer.pyth.network/tx/${item.entropyProof.transactionHash}`, '_blank')}
                                 className="flex items-center gap-1 px-2 py-1 bg-[#681DDB]/10 border border-[#681DDB]/30 rounded text-[#681DDB] text-xs hover:bg-[#681DDB]/20 transition-colors"
+                                title="View on Pyth Entropy Explorer"
                               >
                                 <FaExternalLinkAlt size={8} />
                                 Entropy
                               </button>
+                            )}
+                            {item.zetachainTxHash && item.zetachainTxHash !== 'pending' && (
+                              <button
+                                onClick={() => openZetaChainExplorer(item.zetachainTxHash)}
+                                className="flex items-center gap-1 px-2 py-1 bg-[#00FF87]/10 border border-[#00FF87]/30 rounded text-[#00FF87] text-xs hover:bg-[#00FF87]/20 transition-colors"
+                                title="View on ZetaChain Universal Explorer"
+                              >
+                                <FaExternalLinkAlt size={8} />
+                                ZetaChain
+                              </button>
+                            )}
+                            {item.zetachainTxHash === 'pending' && (
+                              <div
+                                className="flex items-center gap-1 px-2 py-1 bg-[#FFC107]/10 border border-[#FFC107]/30 rounded text-[#FFC107] text-xs"
+                                title="ZetaChain transaction pending"
+                              >
+                                <div className="w-3 h-3 border-2 border-[#FFC107] border-t-transparent rounded-full animate-spin"></div>
+                                ZetaChain
+                              </div>
                             )}
                           </div>
                         </div>

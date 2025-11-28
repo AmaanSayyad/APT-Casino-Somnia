@@ -27,6 +27,14 @@ const WheelHistory = ({ gameHistory = [] }) => {
       window.open(entropyExplorerUrl, '_blank');
     }
   };
+
+  // Open ZetaChain Explorer link
+  const openZetaChainExplorer = (txHash) => {
+    if (txHash && txHash !== 'unknown') {
+      const zetaExplorerUrl = `https://testnet.zetascan.com/tx/${txHash}`;
+      window.open(zetaExplorerUrl, '_blank');
+    }
+  };
   
   // Use real game history data from props instead of sample data
   const historyData = gameHistory.length > 0 ? gameHistory : [];
@@ -628,6 +636,26 @@ const WheelHistory = ({ gameHistory = [] }) => {
                               }}
                             >
                               Entropy
+                            </Button>
+                          )}
+                          {item.zetachainTxHash && item.zetachainTxHash !== 'pending' && (
+                            <Button
+                              onClick={() => openZetaChainExplorer(item.zetachainTxHash)}
+                              size="small"
+                              startIcon={<FaExternalLinkAlt size={10} />}
+                              sx={{ 
+                                color: '#00FF87',
+                                fontSize: '0.7rem',
+                                minWidth: 'auto',
+                                p: 0,
+                                '&:hover': {
+                                  backgroundColor: 'transparent',
+                                  textDecoration: 'underline',
+                                }
+                              }}
+                              title="View on ZetaChain Universal Explorer"
+                            >
+                              ZetaChain
                             </Button>
                           )}
                         </Box>
