@@ -72,7 +72,7 @@ if (hasAPICall && hasGameType && hasPlayerAddress) {
 
 // Check 5: Transaction hash storage
 console.log('5️⃣ Checking transaction hash storage...');
-const hasTxHashStorage = rouletteContent.includes('zetachainTxHash: txHash');
+const hasTxHashStorage = rouletteContent.includes('zetachainTxHash: data.txHash') || rouletteContent.includes('zetachainTxHash: txHash');
 if (hasTxHashStorage) {
   console.log('   ✅ ZetaChain transaction hash storage implemented\n');
 } else {

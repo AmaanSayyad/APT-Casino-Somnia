@@ -26,6 +26,7 @@ import AIAutoBetting from "./components/AIAutoBetting";
 import AISettingsModal from "./components/AISettingsModal";
 import pythEntropyService from '@/services/PythEntropyService';
 import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
+import { isZetaChainConfigured } from '@/config/zetachainConfig';
 
 export default function Mines() {
   // Game State
@@ -67,8 +68,42 @@ export default function Mines() {
   // Somnia Game Logger
   const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
   
+  // ZetaChain logging state
+  const [isZetaChainLogging, setIsZetaChainLogging] = useState(false);
+  const [zetaChainError, setZetaChainError] = useState(null);
+  const [zetaChainEnabled, setZetaChainEnabled] = useState(false);
+  
   // Theme
   const { theme } = useTheme();
+  
+  // Check ZetaChain availability (backend handles signing)
+  useEffect(() => {
+    const checkZetaChain = async () => {
+      try {
+        // Check if ZetaChain is configured
+        if (!isZetaChainConfigured()) {
+          console.log('⚠️ ZetaChain not configured');
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // Check if wallet is connected (we need player address)
+        if (!isConnected || !address) {
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // ZetaChain is available (backend will handle signing)
+        setZetaChainEnabled(true);
+        console.log('✅ ZetaChain logging available for Mines (backend signing)');
+      } catch (error) {
+        console.error('❌ Failed to check ZetaChain availability:', error);
+        setZetaChainEnabled(false);
+      }
+    };
+
+    checkZetaChain();
+  }, [isConnected, address]);
   
   // Handle AI activation/deactivation
   const handleAIToggle = () => {
@@ -251,6 +286,63 @@ export default function Mines() {
       }).catch(error => {
         console.warn('⚠️ Failed to log Mines game to Somnia:', error);
       });
+      
+      // Log game result to ZetaChain via backend API (optional, non-blocking)
+      if (zetaChainEnabled) {
+        setIsZetaChainLogging(true);
+        setZetaChainError(null);
+        
+        // Send to backend API for ZetaChain logging
+        fetch('/api/zetachain/log-game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameType: 'MINES',
+            playerAddress: address,
+            betAmount: (result.betAmount || 0).toString(),
+            result: {
+              minePositions: result.minePositions || [],
+              revealedPositions: result.revealedPositions || [],
+              hitMine: result.hitMine || false,
+              safeRevealed: result.safeRevealed || 0,
+              currentMultiplier: result.multiplier || 0
+            },
+            payout: (result.payout || 0).toString(),
+            entropyProof: {
+              requestId: entropyResult.entropyProof.requestId,
+              transactionHash: entropyResult.entropyProof.transactionHash
+            }
+          })
+        })
+        .then(async (response) => {
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Backend error: ${errorText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success && data.txHash) {
+            console.log('✅ Mines game logged to ZetaChain:', data.explorerUrl);
+            // Update game history with ZetaChain transaction hash
+            setGameHistory(prev => {
+              const updatedHistory = [...prev];
+              if (updatedHistory.length > 0) {
+                updatedHistory[0] = { ...updatedHistory[0], zetachainTxHash: data.txHash };
+              }
+              return updatedHistory;
+            });
+          }
+          setIsZetaChainLogging(false);
+        })
+        .catch(error => {
+          console.warn('⚠️ Failed to log Mines game to ZetaChain:', error);
+          setZetaChainError(error.message || 'Failed to log to ZetaChain');
+          setIsZetaChainLogging(false);
+        });
+      } else {
+        console.log('ℹ️ ZetaChain logging disabled or not configured');
+      }
       
     } catch (error) {
       console.error('❌ Error using Pyth Entropy for Mines game:', error);
@@ -476,6 +568,28 @@ export default function Mines() {
           className="relative z-10"
         >
           <Game betSettings={betSettings} onGameStatusChange={setGameStatus} onGameComplete={handleGameComplete} />
+          
+          {/* ZetaChain logging status indicator */}
+          {zetaChainEnabled && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {isZetaChainLogging ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                  <span className="text-sm text-purple-400">
+                    Logging to ZetaChain...
+                  </span>
+                </>
+              ) : zetaChainError ? (
+                <span className="text-sm text-red-400 flex items-center gap-1">
+                  ⚠️ ZetaChain: {zetaChainError}
+                </span>
+              ) : (
+                <span className="text-sm text-green-400 flex items-center gap-1">
+                  ✓ ZetaChain logging enabled
+                </span>
+              )}
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </div>
