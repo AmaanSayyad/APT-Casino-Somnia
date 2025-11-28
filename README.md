@@ -1036,3 +1036,6 @@ apt-casino/
 - **Website Link**: [https://apt-casino-somnia.vercel.app/](https://apt-casino-somnia.vercel.app/)
 - **Live Demo**: [https://youtu.be/F-6Gsy1Qi1s](https://youtu.be/F-6Gsy1Qi1s)
 - **Pitch Deck**: [https://www.figma.com/deck/Q5MbzVrmnX4954oa1CkydC/APT-Casino-Somnia?node-id=1-1812&p=f&t=Kc0BblSLdau5HO3b-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1](https://www.figma.com/deck/Q5MbzVrmnX4954oa1CkydC/APT-Casino-Somnia?node-id=1-1812&p=f&t=Kc0BblSLdau5HO3b-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1)
+- **Contract Links**: 
+  - https://shannon-explorer.somnia.network/address/0x649A1a3cf745d60C98C12f3c404E09bdBb4151db?tab=contract
+  - https://shannon-explorer.somnia.network/address/0xacA996A4d49e7Ed42dA68a20600F249BE6d024A4?tab=contract
