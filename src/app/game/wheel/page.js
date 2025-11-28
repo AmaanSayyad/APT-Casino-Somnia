@@ -21,6 +21,7 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 // import vrfLogger from '@/services/VRFLoggingService';
 import pythEntropyService from '@/services/PythEntropyService';
 import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
+import { isZetaChainConfigured } from '@/config/zetachainConfig';
 
 // Import new components
 import WheelVideo from "./components/WheelVideo";
@@ -53,10 +54,15 @@ export default function Home() {
   const dispatch = useDispatch();
   const { userBalance, isLoading: isLoadingBalance } = useSelector((state) => state.balance);
   const notification = useNotification();
-  const { isConnected } = useWalletStatus();
+  const { isConnected, address } = useWalletStatus();
   
   // Somnia Game Logger
   const { logGame, isLogging, getExplorerUrl } = useSomniaGameLogger();
+  
+  // ZetaChain logging state
+  const [isZetaChainLogging, setIsZetaChainLogging] = useState(false);
+  const [zetaChainError, setZetaChainError] = useState(null);
+  const [zetaChainEnabled, setZetaChainEnabled] = useState(false);
   
   // Use ref to prevent infinite loop in useEffect
   const isInitialized = useRef(false);
@@ -77,6 +83,35 @@ export default function Home() {
     
     isInitialized.current = true; // Mark as initialized
   }, []); // Empty dependency array since we use ref
+
+  // Check ZetaChain availability (backend handles signing)
+  useEffect(() => {
+    const checkZetaChain = async () => {
+      try {
+        // Check if ZetaChain is configured
+        if (!isZetaChainConfigured()) {
+          console.log('⚠️ ZetaChain not configured');
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // Check if wallet is connected (we need player address)
+        if (!isConnected || !address) {
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // ZetaChain is available (backend will handle signing)
+        setZetaChainEnabled(true);
+        console.log('✅ ZetaChain logging available for Wheel (backend signing)');
+      } catch (error) {
+        console.error('❌ Failed to check ZetaChain availability:', error);
+        setZetaChainEnabled(false);
+      }
+    };
+
+    checkZetaChain();
+  }, [isConnected, address]);
 
   // Scroll to section function
   const scrollToSection = (sectionId) => {
@@ -157,6 +192,59 @@ export default function Home() {
       }).catch(error => {
         console.warn('⚠️ Failed to log Wheel game to Somnia:', error);
       });
+      
+      // Log game result to ZetaChain via backend API (optional, non-blocking)
+      if (zetaChainEnabled) {
+        setIsZetaChainLogging(true);
+        setZetaChainError(null);
+        
+        // Send to backend API for ZetaChain logging
+        fetch('/api/zetachain/log-game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameType: 'WHEEL',
+            playerAddress: address,
+            betAmount: betAmount.toString(),
+            result: {
+              winningSegment: historyItemId,
+              multiplier: actualMultiplier,
+              color: detectedColor
+            },
+            payout: winAmount.toString(),
+            entropyProof: {
+              requestId: entropyResult.entropyProof.requestId,
+              transactionHash: entropyResult.entropyProof.transactionHash
+            }
+          })
+        })
+        .then(async (response) => {
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Backend error: ${errorText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success && data.txHash) {
+            console.log('✅ Wheel game logged to ZetaChain:', data.explorerUrl);
+            // Update game history with ZetaChain transaction hash
+            setGameHistory(prev => prev.map(item => 
+              item.id === historyItemId 
+                ? { ...item, zetachainTxHash: data.txHash }
+                : item
+            ));
+          }
+          setIsZetaChainLogging(false);
+        })
+        .catch(error => {
+          console.warn('⚠️ Failed to log Wheel game to ZetaChain:', error);
+          setZetaChainError(error.message || 'Failed to log to ZetaChain');
+          setIsZetaChainLogging(false);
+        });
+      } else {
+        console.log('ℹ️ ZetaChain logging disabled or not configured');
+      }
       
       // Log on-chain via casino wallet (non-blocking)
       try {
@@ -723,6 +811,28 @@ export default function Home() {
               autoBet={autoBet}
               isSpinning={isSpinning}
             />
+            
+            {/* ZetaChain logging status indicator */}
+            {zetaChainEnabled && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm">
+                {isZetaChainLogging ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                    <span className="text-red-400">
+                      Logging to ZetaChain...
+                    </span>
+                  </>
+                ) : zetaChainError ? (
+                  <span className="text-red-400 flex items-center gap-1">
+                    ⚠️ ZetaChain: {zetaChainError}
+                  </span>
+                ) : (
+                  <span className="text-green-400 flex items-center gap-1">
+                    ✓ ZetaChain logging enabled
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
