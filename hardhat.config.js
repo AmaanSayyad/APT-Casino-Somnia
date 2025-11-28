@@ -63,7 +63,18 @@ module.exports = {
     apiKey: {
       arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
+      'somnia-testnet-testnet': "abc" // Blockscout doesn't require API key
     },
+    customChains: [
+      {
+        network: "somnia-testnet-testnet",
+        chainId: 50312,
+        urls: {
+          apiURL: "https://shannon-explorer.somnia.network/api",
+          browserURL: "https://shannon-explorer.somnia.network"
+        }
+      }
+    ]
   },
   paths: {
     sources: "./contracts",

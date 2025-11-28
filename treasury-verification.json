@@ -1,0 +1,28 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/SomniaTreasury.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\nimport \"@openzeppelin/contracts/utils/ReentrancyGuard.sol\";\n\n/**\n * @title SomniaTreasury\n * @dev Treasury contract for managing STT deposits and withdrawals on Somnia Testnet\n */\ncontract SomniaTreasury is Ownable, ReentrancyGuard {\n    event Deposit(address indexed user, uint256 amount, uint256 timestamp);\n    event Withdrawal(address indexed user, uint256 amount, uint256 timestamp);\n    event EmergencyWithdrawal(address indexed owner, uint256 amount, uint256 timestamp);\n\n    // User balances\n    mapping(address => uint256) public balances;\n    \n    // Total deposits and withdrawals for analytics\n    uint256 public totalDeposits;\n    uint256 public totalWithdrawals;\n    uint256 public totalUsers;\n    \n    // Track unique users\n    mapping(address => bool) public hasDeposited;\n\n    // Minimum deposit amount (0.001 STT)\n    uint256 public minDeposit = 0.001 ether;\n    \n    // Maximum deposit amount (100 STT)\n    uint256 public maxDeposit = 100 ether;\n\n    constructor() Ownable(msg.sender) {\n        // Constructor initializes Ownable with deployer as owner\n    }\n\n    /**\n     * @dev Deposit STT to the treasury\n     */\n    function deposit() external payable nonReentrant {\n        require(msg.value >= minDeposit, \"Deposit amount too low\");\n        require(msg.value <= maxDeposit, \"Deposit amount too high\");\n        \n        if (!hasDeposited[msg.sender]) {\n            hasDeposited[msg.sender] = true;\n            totalUsers++;\n        }\n        \n        balances[msg.sender] += msg.value;\n        totalDeposits += msg.value;\n        \n        emit Deposit(msg.sender, msg.value, block.timestamp);\n    }\n\n    /**\n     * @dev Withdraw STT from the treasury\n     * @param amount Amount to withdraw in wei\n     */\n    function withdraw(uint256 amount) external nonReentrant {\n        require(amount > 0, \"Withdrawal amount must be greater than 0\");\n        require(balances[msg.sender] >= amount, \"Insufficient balance\");\n        require(address(this).balance >= amount, \"Insufficient treasury balance\");\n        \n        balances[msg.sender] -= amount;\n        totalWithdrawals += amount;\n        \n        (bool success, ) = payable(msg.sender).call{value: amount}(\"\");\n        require(success, \"Withdrawal transfer failed\");\n        \n        emit Withdrawal(msg.sender, amount, block.timestamp);\n    }\n\n    /**\n     * @dev Get user balance\n     * @param user User address\n     * @return User balance in wei\n     */\n    function getBalance(address user) external view returns (uint256) {\n        return balances[user];\n    }\n\n    /**\n     * @dev Get treasury statistics\n     * @return contractBalance Total STT in treasury\n     * @return totalDeposited Total STT deposited\n     * @return totalWithdrawn Total STT withdrawn\n     * @return userCount Total unique users\n     */\n    function getTreasuryStats() external view returns (\n        uint256 contractBalance,\n        uint256 totalDeposited,\n        uint256 totalWithdrawn,\n        uint256 userCount\n    ) {\n        return (\n            address(this).balance,\n            totalDeposits,\n            totalWithdrawals,\n            totalUsers\n        );\n    }\n\n    /**\n     * @dev Update minimum deposit amount (only owner)\n     * @param newMinDeposit New minimum deposit in wei\n     */\n    function updateMinDeposit(uint256 newMinDeposit) external onlyOwner {\n        require(newMinDeposit > 0, \"Min deposit must be greater than 0\");\n        minDeposit = newMinDeposit;\n    }\n\n    /**\n     * @dev Update maximum deposit amount (only owner)\n     * @param newMaxDeposit New maximum deposit in wei\n     */\n    function updateMaxDeposit(uint256 newMaxDeposit) external onlyOwner {\n        require(newMaxDeposit > minDeposit, \"Max deposit must be greater than min deposit\");\n        maxDeposit = newMaxDeposit;\n    }\n\n    /**\n     * @dev Emergency withdrawal by owner (only in case of critical issues)\n     * @param to Address to send funds to\n     * @param amount Amount to withdraw\n     */\n    function emergencyWithdraw(address to, uint256 amount) external onlyOwner {\n        require(to != address(0), \"Invalid recipient address\");\n        require(amount <= address(this).balance, \"Insufficient balance\");\n        \n        (bool success, ) = payable(to).call{value: amount}(\"\");\n        require(success, \"Emergency withdrawal failed\");\n        \n        emit EmergencyWithdrawal(to, amount, block.timestamp);\n    }\n\n    /**\n     * @dev Receive function to accept direct STT transfers\n     */\n    receive() external payable {\n        if (msg.value >= minDeposit && msg.value <= maxDeposit) {\n            if (!hasDeposited[msg.sender]) {\n                hasDeposited[msg.sender] = true;\n                totalUsers++;\n            }\n            balances[msg.sender] += msg.value;\n            totalDeposits += msg.value;\n            emit Deposit(msg.sender, msg.value, block.timestamp);\n        }\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    }
+  }
+}
