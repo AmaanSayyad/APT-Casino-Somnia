@@ -87,7 +87,7 @@ export async function POST(request) {
     const tx = await treasuryWallet.sendTransaction({
       to: formattedUserAddress,
       value: amountWei,
-      gasLimit: process.env.GAS_LIMIT_WITHDRAW ? parseInt(process.env.GAS_LIMIT_WITHDRAW) : 100000
+      gasLimit: 500000 // Increased gas limit for Somnia Testnet
     });
 
     console.log(`📤 Transaction sent: ${tx.hash}`);

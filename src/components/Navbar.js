@@ -536,7 +536,7 @@ export default function Navbar() {
         to: TREASURY_ADDRESS,
         from: userAccount,
         value: '0x' + parseInt(amountWei).toString(16), // Convert to hex
-        gas: '0x5208', // 21000 gas for simple ETH transfer
+        gas: '0x7A120', // 500000 gas limit
       };
       
       console.log('Sending transaction to MetaMask:', transactionParameters);
