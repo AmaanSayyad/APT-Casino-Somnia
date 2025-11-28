@@ -321,3 +321,158 @@ The system includes comprehensive error handling:
 - Fallback random generation
 
 This implementation ensures fair, verifiable, and secure randomness for all casino games while maintaining high availability through fallback mechanisms.
+
+## Somnia Data Streams Integration
+
+After game results are generated using Pyth Entropy, they are logged on Somnia Testnet and broadcast in real-time using Somnia Data Streams.
+
+### Game Result Logging Flow
+
+```mermaid
+graph TD
+    A[Pyth Entropy Result] --> B[Process Game Logic]
+    B --> C[Calculate Payout]
+    C --> D[Log to SomniaGameLogger]
+    D --> E[Emit GameResultLogged Event]
+    E --> F[Somnia Data Streams]
+    F --> G[Broadcast to All Clients]
+    G --> H[Real-time Notifications]
+```
+
+### Game Logger Contract
+
+**File: `contracts/SomniaGameLogger.sol`**
+
+```solidity
+contract SomniaGameLogger {
+    event GameResultLogged(
+        bytes32 indexed logId,
+        address indexed player,
+        uint8 gameType,
+        uint256 betAmount,
+        uint256 payout,
+        bytes32 entropyRequestId,
+        string entropyTxHash,
+        uint256 timestamp
+    );
+    
+    function logGameResult(
+        uint8 _gameType,
+        uint256 _betAmount,
+        bytes memory _resultData,
+        uint256 _payout,
+        bytes32 _entropyRequestId,
+        string memory _entropyTxHash
+    ) external returns (bytes32) {
+        // Store game data and emit event
+        emit GameResultLogged(logId, msg.sender, ...);
+        return logId;
+    }
+}
+```
+
+### Somnia Data Streams Service
+
+**File: `src/services/SomniaStreamsService.js`**
+
+```javascript
+class SomniaStreamsService {
+    async subscribe() {
+        const subscription = await this.sdk.streams.subscribe({
+            somniaStreamsEventId: 'apt-casino-game-result-logged',
+            ethCalls: [],
+            onData: (data) => {
+                const event = this.parseGameResultEvent(data);
+                this.notifyAllClients(event);
+            }
+        });
+        return subscription;
+    }
+    
+    parseGameResultEvent(data) {
+        return {
+            logId: data.logId,
+            player: data.player,
+            gameType: this.getGameTypeName(data.gameType),
+            betAmount: formatEther(data.betAmount),
+            payout: formatEther(data.payout),
+            entropyRequestId: data.entropyRequestId,
+            timestamp: new Date(Number(data.timestamp) * 1000)
+        };
+    }
+}
+```
+
+### Event Schema
+
+**Schema ID: `apt-casino-game-result-logged`**
+
+```javascript
+{
+    schemaId: 'apt-casino-game-result-logged',
+    params: [
+        { name: 'logId', type: 'bytes32', indexed: true },
+        { name: 'player', type: 'address', indexed: true },
+        { name: 'gameType', type: 'uint8', indexed: false },
+        { name: 'betAmount', type: 'uint256', indexed: false },
+        { name: 'payout', type: 'uint256', indexed: false },
+        { name: 'entropyRequestId', type: 'bytes32', indexed: false },
+        { name: 'entropyTxHash', type: 'string', indexed: false },
+        { name: 'timestamp', type: 'uint256', indexed: false }
+    ]
+}
+```
+
+### Complete Flow: Entropy to Notification
+
+```mermaid
+sequenceDiagram
+    participant Game
+    participant API
+    participant Arbitrum as Arbitrum Sepolia
+    participant Pyth as Pyth Entropy
+    participant Somnia as Somnia Testnet
+    participant GL as Game Logger
+    participant SDS as Somnia Data Streams
+    participant Clients as All Clients
+
+    Game->>API: Request Game Result
+    API->>Arbitrum: Request Entropy
+    Arbitrum->>Pyth: Generate Random
+    Pyth->>Arbitrum: Return Entropy
+    Arbitrum->>API: Entropy Value + Proof
+    
+    API->>API: Process Game Logic
+    API->>Somnia: Log Game Result
+    Somnia->>GL: logGameResult()
+    GL->>SDS: Emit GameResultLogged
+    SDS->>Clients: Real-time Broadcast
+    
+    API->>Game: Return Result
+    Clients->>Clients: Show Notification
+```
+
+### Benefits of SDS Integration
+
+1. **Real-time Updates**: All players see game results instantly (< 1 second latency)
+2. **Social Experience**: Creates a live casino atmosphere
+3. **Transparency**: All game results are on-chain and verifiable
+4. **Multi-client Sync**: All browsers stay synchronized
+5. **Fallback Support**: HTTP polling if WebSocket unavailable
+
+### Network Architecture
+
+| Network | Chain ID | Purpose |
+|---------|----------|---------|
+| Somnia Testnet | 50312 | Game logging, treasury, payouts |
+| Arbitrum Sepolia | 421614 | Pyth Entropy for randomness |
+
+### Contract Addresses
+
+| Contract | Network | Address |
+|----------|---------|---------|
+| SomniaTreasury | Somnia Testnet | `0xacA996A4d49e7Ed42dA68a20600F249BE6d024A4` |
+| SomniaGameLogger | Somnia Testnet | `0x649A1a3cf745d60C98C12f3c404E09bdBb4151db` |
+| SDS Protocol | Somnia Testnet | `0x6AB397FF662e42312c003175DCD76EfF69D048Fc` |
+| CasinoEntropyConsumer | Arbitrum Sepolia | Check deployments/ |
+| Pyth Entropy | Arbitrum Sepolia | `0x549ebba8036ab746611b4ffa1423eb0a4df61440` |

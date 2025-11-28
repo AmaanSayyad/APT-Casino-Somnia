@@ -535,13 +535,24 @@ export default function Navbar() {
       // Treasury contract deposit() function signature
       const depositFunctionSignature = '0xd0e30db0'; // deposit()
       
+      // Get current gas price from the network
+      let gasPrice;
+      try {
+        gasPrice = await window.ethereum.request({ method: 'eth_gasPrice' });
+        console.log('Current gas price:', gasPrice);
+      } catch (gasPriceError) {
+        console.log('Could not get gas price, using default');
+        gasPrice = '0x3B9ACA00'; // 1 Gwei default
+      }
+      
       // Send transaction to treasury contract
       const transactionParameters = {
         to: TREASURY_ADDRESS,
         from: userAccount,
         value: amountHex,
         data: depositFunctionSignature,
-        gas: '0x7A120', // 500000 gas limit
+        gas: '0x1E8480', // 2000000 gas limit (increased for Somnia contract calls)
+        gasPrice: gasPrice,
       };
       
       console.log('Sending deposit transaction to Treasury:', transactionParameters);

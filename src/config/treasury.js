@@ -1,17 +1,17 @@
 // Casino Treasury Configuration
 // This file contains the treasury wallet address and related configuration
 
-// Test Treasury Address (Replace with your actual treasury address in production)
+// Treasury Contract Address (deployed on Somnia Testnet)
 export const TREASURY_CONFIG = {
-  // Somnia Testnet Treasury Wallet (for deposits/withdrawals)
-  ADDRESS: process.env.SOMNIA_TESTNET_TREASURY_ADDRESS || process.env.TREASURY_ADDRESS || '0x025182b20Da64b5997d09a5a62489741F68d9B96',
+  // Somnia Testnet Treasury Contract (for deposits/withdrawals)
+  ADDRESS: process.env.SOMNIA_TESTNET_TREASURY_ADDRESS || process.env.TREASURY_ADDRESS || '0xacA996A4d49e7Ed42dA68a20600F249BE6d024A4',
   
   // ⚠️  DEVELOPMENT ONLY - Never use in production!
   PRIVATE_KEY: process.env.SOMNIA_TESTNET_TREASURY_PRIVATE_KEY || process.env.TREASURY_PRIVATE_KEY || '0x73e0cfb4d786d6e542533e18eb78fb5c727ab802b89c6850962042a8f0835f0c',
   
   // Network configuration for Somnia Testnet (for deposit/withdraw)
   NETWORK: {
-    CHAIN_ID: '0xc488', // Somnia Testnet (10143 in hex)
+    CHAIN_ID: '0xc488', // Somnia Testnet (50312 in decimal)
     CHAIN_NAME: 'Somnia Testnet',
     RPC_URL: process.env.NEXT_PUBLIC_SOMNIA_TESTNET_TESTNET_RPC || 'https://dream-rpc.somnia.network',
     EXPLORER_URL: process.env.NEXT_PUBLIC_SOMNIA_TESTNET_TESTNET_EXPLORER || 'https://shannon-explorer.somnia.network'
@@ -19,8 +19,8 @@ export const TREASURY_CONFIG = {
   
   // Gas settings for transactions
   GAS: {
-    DEPOSIT_LIMIT: process.env.GAS_LIMIT_DEPOSIT ? '0x' + parseInt(process.env.GAS_LIMIT_DEPOSIT).toString(16) : '0x5208', // 21000 gas for simple ETH transfer
-    WITHDRAW_LIMIT: process.env.GAS_LIMIT_WITHDRAW ? '0x' + parseInt(process.env.GAS_LIMIT_WITHDRAW).toString(16) : '0x186A0', // 100000 gas for more complex operations
+    DEPOSIT_LIMIT: process.env.GAS_LIMIT_DEPOSIT ? '0x' + parseInt(process.env.GAS_LIMIT_DEPOSIT).toString(16) : '0x1E8480', // 2000000 gas for contract deposit() call
+    WITHDRAW_LIMIT: process.env.GAS_LIMIT_WITHDRAW ? '0x' + parseInt(process.env.GAS_LIMIT_WITHDRAW).toString(16) : '0x1E8480', // 2000000 gas for contract withdraw() call
   },
   
   // Minimum and maximum deposit amounts (in STT)

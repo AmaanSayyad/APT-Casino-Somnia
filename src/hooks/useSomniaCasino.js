@@ -74,12 +74,17 @@ export const useSomniaCasino = () => {
 
       const value = parseEther(amount.toString());
       
-      // Send transaction to treasury contract
+      // Treasury contract deposit() function signature
+      const depositFunctionData = '0xd0e30db0'; // deposit()
+      
+      // Send transaction to treasury contract with explicit gas settings
       const hash = await walletClient.sendTransaction({
         to: TREASURY_ADDRESS,
         value,
+        data: depositFunctionData,
         account,
         chain,
+        gas: BigInt(2000000), // 2M gas limit for Somnia contract calls
       });
 
       console.log('Deposit transaction sent:', hash);

@@ -1,4 +1,4 @@
-# APT Casino Monad - Mermaid Architecture Diagrams
+# APT Casino Somnia - Mermaid Architecture Diagrams
 
 ## 🏗️ System Architecture Overview
 
@@ -10,6 +10,8 @@ graph TB
         B --> D[Material-UI]
         B --> E[RainbowKit + MetaMask Smart Accounts]
         E --> SA[Smart Account Detection]
+        B --> LS[Livepeer Streaming]
+        B --> CC[Community Chat]
     end
     
     subgraph State["State Management"]
@@ -20,15 +22,24 @@ graph TB
     
     subgraph API["API Layer"]
         I[Next.js API Routes] --> J[Pyth Entropy Endpoints]
-        I --> K[Deposit/Withdraw MON]
+        I --> K[Deposit/Withdraw STT]
         I --> L[Game Logic]
         I --> SAA[Smart Account API]
+        I --> SC[Socket.IO Chat]
+        I --> LP[Livepeer API]
     end
     
-    subgraph Gaming["Gaming Network - Monad Testnet"]
-        MT[Monad Testnet] --> MON[MON Token]
-        MT --> DEP[Deposits/Withdrawals]
-        MT --> SA_BATCH[Batch Transactions]
+    subgraph Gaming["Gaming Network - Somnia Testnet"]
+        ST[Somnia Testnet] --> STT[STT Token]
+        ST --> DEP[Treasury Deposits]
+        ST --> SA_BATCH[Batch Transactions]
+        ST --> GL[Game Logger Contract]
+    end
+    
+    subgraph DataStreams["Somnia Data Streams"]
+        GL --> SDS[SDS Protocol]
+        SDS --> WS[WebSocket Subscriptions]
+        WS --> RT[Real-time Notifications]
     end
     
     subgraph Entropy["Entropy Network - Arbitrum Sepolia"]
@@ -39,6 +50,7 @@ graph TB
     
     subgraph Data["Data Layer"]
         Q[PostgreSQL] --> R[User Data]
+        Q --> CH[Chat History]
         S[Redis Cache] --> T[Session Data]
         S --> U[Game State]
         S --> SAC[Smart Account Cache]
@@ -46,12 +58,13 @@ graph TB
     
     A --> F
     B --> I
-    I --> MT
+    I --> ST
     I --> AS
     I --> Q
     I --> S
     N --> I
     SA --> SAA
+    RT --> B
 ```
 
 ## 🔄 Application Bootstrap Flow
@@ -64,6 +77,7 @@ sequenceDiagram
     participant P as Providers
     participant W as Wagmi
     participant R as RainbowKit
+    participant SDS as Somnia Data Streams
     
     U->>B: Access Application
     B->>N: Load App Router
@@ -71,6 +85,8 @@ sequenceDiagram
     P->>W: Setup Wagmi Config
     W->>R: Initialize RainbowKit
     R->>P: Wallet UI Ready
+    P->>SDS: Initialize Data Streams
+    SDS->>P: WebSocket Connected
     P->>N: Providers Ready
     N->>B: Render Application
     B->>U: Display UI
@@ -96,8 +112,8 @@ flowchart TD
     I --> K
     
     K --> L{Network Check}
-    L -->|Monad Testnet| M[Connection Success]
-    L -->|Wrong Network| N[Switch to Monad Testnet]
+    L -->|Somnia Testnet| M[Connection Success]
+    L -->|Wrong Network| N[Switch to Somnia Testnet]
     
     N --> O{User Approves?}
     O -->|Yes| M
@@ -116,6 +132,7 @@ flowchart TD
     V --> X
     W --> X
     X --> Y[Enable Game Features]
+    Y --> Z[Subscribe to Data Streams]
 ```
 
 ## 🔷 Smart Account Detection & Features
@@ -159,7 +176,7 @@ graph TB
     end
 ```
 
-## �  Multi-Network Architecture (Monad + Arbitrum)
+## 🌐 Multi-Network Architecture (Somnia + Arbitrum)
 
 ```mermaid
 graph TB
@@ -174,18 +191,30 @@ graph TB
         NS --> GM[Game Manager]
     end
     
-    subgraph MonadNet["Monad Testnet (Chain ID: 10143)"]
-        MT[Monad Testnet] --> MON[MON Token]
-        MON --> DEP[Deposit Contract]
-        MON --> WITH[Withdraw Contract]
+    subgraph SomniaNet["Somnia Testnet (Chain ID: 50312)"]
+        ST[Somnia Testnet] --> STT[STT Token]
+        STT --> DEP[Treasury Contract]
+        STT --> WITH[Withdraw Contract]
         DEP --> TB[Treasury Balance]
         WITH --> TB
+        
+        subgraph GameLogging["Game Logging"]
+            GL[SomniaGameLogger]
+            GL --> EVENT[GameResultLogged Event]
+        end
         
         subgraph SmartAccount["Smart Account Features"]
             BATCH[Batch Transactions]
             SPONSOR[Sponsored TX]
             SESSION[Session Keys]
         end
+    end
+    
+    subgraph SomniaStreams["Somnia Data Streams"]
+        EVENT --> SDS[SDS Protocol]
+        SDS --> WS[WebSocket]
+        WS --> BROADCAST[Real-time Broadcast]
+        BROADCAST --> CLIENTS[All Connected Clients]
     end
     
     subgraph ArbitrumNet["Arbitrum Sepolia (Chain ID: 421614)"]
@@ -201,7 +230,7 @@ graph TB
     end
     
     U --> F
-    F --> MT
+    F --> ST
     F --> AS
     GM --> DEP
     GM --> EC
@@ -209,6 +238,63 @@ graph TB
     REQ --> GEN
     GEN --> PROOF
     PROOF --> GM
+    GM --> GL
+```
+
+## 📡 Somnia Data Streams Architecture
+
+```mermaid
+graph TB
+    subgraph GameExecution["Game Execution"]
+        A[Player Plays Game] --> B[Entropy Generated]
+        B --> C[Game Result Calculated]
+        C --> D[Backend API Call]
+    end
+    
+    subgraph SomniaTestnet["Somnia Testnet"]
+        D --> E[Treasury Signs Transaction]
+        E --> F[GameLogger Contract]
+        F --> G[GameResultLogged Event]
+    end
+    
+    subgraph SomniaDataStreams["Somnia Data Streams Protocol"]
+        G --> H[SDS Protocol Contract]
+        H --> I[Event Schema Registry]
+        I --> J[WebSocket / HTTP Polling]
+    end
+    
+    subgraph ClientApps["Client Applications"]
+        J --> K[All Connected Browsers]
+        K --> L[GlobalNotificationSystem]
+        L --> M[Real-time UI Updates]
+    end
+```
+
+## 🔄 Somnia Data Streams Event Flow
+
+```mermaid
+sequenceDiagram
+    participant Player
+    participant Game
+    participant API
+    participant Treasury
+    participant GameLogger
+    participant SDS as Somnia Data Streams
+    participant AllClients
+
+    Player->>Game: Complete Game
+    Game->>API: POST /api/log-game
+    API->>Treasury: Sign with Private Key
+    Treasury->>GameLogger: logGameResult()
+    GameLogger->>GameLogger: Store Game Data
+    GameLogger->>SDS: Emit GameResultLogged Event
+    
+    Note over SDS: Event captured by SDS Protocol
+    
+    SDS->>AllClients: Broadcast Event (Real-time < 1s)
+    AllClients->>AllClients: Show Notification Instantly
+    
+    Note over AllClients: All users see live activity!
 ```
 
 ## 🎲 Pyth Entropy Integration Architecture
@@ -240,29 +326,31 @@ graph LR
     K --> A
 ```
 
-## 🎮 Game Execution Flow (Smart Account Enhanced)
+## 🎮 Game Execution Flow with Data Streams
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant SA as Smart Account
     participant UI as Game UI
-    participant MT as Monad Testnet
+    participant ST as Somnia Testnet
     participant API as API Route
     participant SC as Smart Contract (Arbitrum)
     participant PE as Pyth Entropy
-    participant DB as Database
+    participant GL as Game Logger
+    participant SDS as Somnia Data Streams
+    participant AC as All Clients
     
     U->>SA: Initiate Game Session
     SA->>UI: Check Account Type
     
     alt Smart Account
         UI->>SA: Enable Batch Features
-        SA->>MT: Batch Bet Transactions
-        MT->>UI: Confirm Batch
+        SA->>ST: Batch Bet Transactions
+        ST->>UI: Confirm Batch
     else EOA Account
-        UI->>MT: Single Bet Transaction
-        MT->>UI: Confirm Single Bet
+        UI->>ST: Single Bet Transaction
+        ST->>UI: Confirm Single Bet
     end
     
     UI->>API: POST /api/generate-entropy
@@ -273,18 +361,22 @@ sequenceDiagram
     
     PE->>SC: entropyCallback()
     SC->>API: Event: EntropyFulfilled
-    API->>DB: Store Game Result
+    
+    API->>GL: logGameResult()
+    GL->>SDS: Emit GameResultLogged
+    SDS->>AC: Real-time Broadcast
     
     alt Smart Account Batch
         API->>SA: Batch Results
-        SA->>MT: Process Batch Payouts
-        MT->>UI: Batch Payout Complete
+        SA->>ST: Process Batch Payouts
+        ST->>UI: Batch Payout Complete
     else Single Transaction
-        API->>MT: Single Payout
-        MT->>UI: Single Payout Complete
+        API->>ST: Single Payout
+        ST->>UI: Single Payout Complete
     end
     
     UI->>U: Display Outcome(s)
+    AC->>AC: Show Notification to All Players
 ```
 
 ## 🏗️ Smart Contract Deployment Flow
@@ -295,22 +387,24 @@ flowchart TD
     B --> C[Hardhat Compilation]
     C --> D[Deploy Script]
     
-    D --> E{Pyth Entropy Setup?}
-    E -->|No| F[Configure Pyth Entropy]
-    E -->|Yes| G[Use Existing Config]
+    D --> E{Deploy to Somnia?}
+    E -->|Yes| F[Deploy SomniaTreasury]
+    F --> G[Deploy SomniaGameLogger]
+    G --> H[Register SDS Schema]
     
-    F --> H[Set Provider Address]
-    G --> I[Deploy CasinoEntropyConsumer]
-    H --> I
+    D --> I{Deploy to Arbitrum?}
+    I -->|Yes| J[Configure Pyth Entropy]
+    J --> K[Deploy CasinoEntropyConsumer]
+    K --> L[Set Treasury Address]
     
-    I --> J[Verify on Arbiscan]
-    J --> K[Set Treasury Address]
-    K --> L[Save Deployment Info]
+    H --> M[Verify Contracts on Explorer]
+    L --> M
+    M --> N[Save Deployment Info]
     
-    L --> M[Test Entropy Function]
-    M --> N{Test Success?}
-    N -->|Yes| O[Deployment Complete]
-    N -->|No| P[Debug & Retry]
+    N --> O[Test Functions]
+    O --> P{All Tests Pass?}
+    P -->|Yes| Q[Deployment Complete]
+    P -->|No| R[Debug & Retry]
 ```
 
 ## 🎯 Game-Specific Flows
@@ -332,9 +426,10 @@ stateDiagram-v2
     SafeTile --> CashOut: Cash Out
     
     ContinueGame --> GameActive
-    CashOut --> GameEnd
-    MineTile --> GameEnd
+    CashOut --> LogToSDS
+    MineTile --> LogToSDS
     
+    LogToSDS --> GameEnd
     GameEnd --> [*]
 ```
 
@@ -347,21 +442,27 @@ graph TD
     D --> E[Ball Path Calculation]
     E --> F[Multiplier Zone]
     F --> G[Payout Calculation]
+    G --> H[Log to SDS]
     
     subgraph Physics["Physics Simulation"]
-        H[Matter.js] --> I[Gravity]
-        I --> J[Collision Detection]
-        J --> K[Bounce Physics]
+        I[Matter.js] --> J[Gravity]
+        J --> K[Collision Detection]
+        K --> L[Bounce Physics]
     end
     
     subgraph Visual["Visual Rendering"]
-        L[Three.js] --> M[3D Ball]
-        M --> N[Peg Animation]
-        N --> O[Trail Effects]
+        M[Three.js] --> N[3D Ball]
+        N --> O[Peg Animation]
+        O --> P[Trail Effects]
     end
     
-    B --> H
-    E --> L
+    subgraph Broadcast["Real-time Broadcast"]
+        H --> Q[Somnia Data Streams]
+        Q --> R[All Connected Clients]
+    end
+    
+    B --> I
+    E --> M
 ```
 
 ### Roulette Game Flow
@@ -382,6 +483,8 @@ flowchart LR
     H --> I[Determine Winners]
     I --> J[Calculate Payouts]
     J --> K[Update Balances]
+    K --> L[Log to SDS]
+    L --> M[Broadcast to All Clients]
 ```
 
 ## 🔐 Security & Access Control
@@ -394,22 +497,29 @@ graph TB
         E[Owner Functions] --> F[Admin Operations]
     end
     
-    subgraph Contract["Smart Contract Security"]
-        G[onlyTreasury Modifier] --> H[request]
-        I[onlyOwner Modifier] --> J[updateTreasury]
-        I --> K[updateEntropyConfig]
-        I --> L[withdrawFees]
+    subgraph SomniaContract["Somnia Testnet Contracts"]
+        G[SomniaTreasury] --> H[deposit/withdraw]
+        I[SomniaGameLogger] --> J[logGameResult]
+        J --> K[onlyAuthorized Modifier]
+    end
+    
+    subgraph ArbitrumContract["Arbitrum Contracts"]
+        L[onlyTreasury Modifier] --> M[request]
+        N[onlyOwner Modifier] --> O[updateTreasury]
+        N --> P[updateEntropyConfig]
+        N --> Q[withdrawFees]
     end
     
     subgraph Frontend["Frontend Security"]
-        M[Wallet Verification] --> N[Network Validation]
-        N --> O[Transaction Signing]
-        O --> P[Gas Estimation]
+        R[Wallet Verification] --> S[Network Validation]
+        S --> T[Transaction Signing]
+        T --> U[Gas Estimation]
     end
     
     D --> G
-    F --> I
-    B --> M
+    D --> I
+    F --> N
+    B --> R
 ```
 
 ## 📊 Data Flow Architecture
@@ -434,42 +544,56 @@ graph LR
         K --> N[User Management]
     end
     
-    subgraph Persistence["Data Persistence"]
-        O[PostgreSQL] --> P[User Data]
-        O --> Q[Game History]
-        R[Redis] --> S[Session Cache]
-        R --> T[Game State]
+    subgraph Blockchain["Blockchain Layer"]
+        O[Somnia Testnet] --> P[Treasury]
+        O --> Q[Game Logger]
+        R[Arbitrum Sepolia] --> S[Entropy Consumer]
+    end
+    
+    subgraph Streaming["Somnia Data Streams"]
+        Q --> T[SDS Protocol]
+        T --> U[WebSocket Broadcast]
+        U --> V[All Clients]
     end
     
     D --> E
     E --> K
     K --> O
     K --> R
+    V --> E
 ```
 
-## 🔄 Request-Response Cycle
+## 🔄 Request-Response Cycle with Data Streams
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant F as Frontend
     participant A as API
-    participant S as Smart Contract
+    participant ST as Somnia Testnet
+    participant AS as Arbitrum Sepolia
     participant PE as Pyth Entropy
-    participant D as Database
+    participant SDS as Somnia Data Streams
+    participant AC as All Clients
     
     U->>F: Game Action
     F->>A: API Request
-    A->>S: Contract Call
-    S->>PE: Entropy Request
+    A->>AS: Request Entropy
+    AS->>PE: Generate Random
     
     Note over PE: Generate Entropy
     
-    PE->>S: entropyCallback
-    S->>A: Event Emission
-    A->>D: Store Result
-    A->>F: Response
-    F->>U: Update UI
+    PE->>AS: entropyCallback
+    AS->>A: Entropy Result
+    A->>ST: Log Game Result
+    ST->>SDS: Emit Event
+    
+    par Broadcast to All
+        SDS->>AC: Real-time Notification
+    and Response to User
+        A->>F: Response
+        F->>U: Update UI
+    end
 ```
 
 ## 🔧 Development Workflow
@@ -496,12 +620,13 @@ flowchart TD
     M -->|No| N[Fix & Retry]
     M -->|Yes| O[Deploy to Staging]
     
-    O --> P[Manual Testing]
-    P --> Q{Ready for Prod?}
-    Q -->|No| R[More Changes]
-    Q -->|Yes| S[Production Deploy]
+    O --> P[Test SDS Integration]
+    P --> Q[Manual Testing]
+    Q --> R{Ready for Prod?}
+    R -->|No| S[More Changes]
+    R -->|Yes| T[Production Deploy]
     
-    R --> A
+    S --> A
     N --> A
 ```
 
@@ -527,86 +652,93 @@ graph LR
         K --> L[Success Rates]
     end
     
-    subgraph Database["Database Metrics"]
-        M[Query Performance] --> N[Connection Pool]
-        N --> O[Cache Performance]
-        O --> P[Storage Usage]
+    subgraph DataStreams["Somnia Data Streams Metrics"]
+        M[WebSocket Latency] --> N[Event Throughput]
+        N --> O[Broadcast Success]
+        O --> P[Connection Stability]
     end
     
-    D --> Q[Monitoring Dashboard]
-    H --> Q
-    L --> Q
-    P --> Q
+    subgraph Database["Database Metrics"]
+        Q[Query Performance] --> R[Connection Pool]
+        R --> S[Cache Performance]
+        S --> T[Storage Usage]
+    end
+    
+    D --> U[Monitoring Dashboard]
+    H --> U
+    L --> U
+    P --> U
+    T --> U
 ```
 
-## 🔮 Pyth Entropy Service Integration
+## 🔮 Somnia Data Streams Service Architecture
 
 ```mermaid
 graph TB
-    subgraph Frontend["Frontend Layer"]
-        A[Game Component] --> B[PythEntropyService]
-        B --> C[API Call]
+    subgraph Service["SomniaStreamsService"]
+        A[Initialize SDK] --> B{WebSocket Available?}
+        B -->|Yes| C[WebSocket Mode]
+        B -->|No| D[HTTP Polling Mode]
+        
+        C --> E[Real-time Events < 1s]
+        D --> F[5-Second Polling]
     end
     
-    subgraph API["API Layer"]
-        D[Next.js API Route] --> E[Pyth Entropy Service]
-        E --> F[Hardhat Script]
+    subgraph EventProcessing["Event Processing"]
+        E --> G[Parse Game Result]
+        F --> G
+        G --> H[Validate Event]
+        H --> I[Deduplicate]
+        I --> J[Format Notification]
     end
     
-    subgraph Contract["Smart Contract Layer"]
-        G[CasinoEntropyConsumer] --> H[request Function]
-        H --> I[Pyth Entropy Contract]
+    subgraph Callbacks["Event Callbacks"]
+        J --> K[onGameResult]
+        K --> L[Update UI State]
+        L --> M[Show Notification]
     end
     
-    subgraph Pyth["Pyth Network"]
-        J[Pyth Provider] --> K[Entropy Generation]
-        K --> L[Callback to Contract]
+    subgraph Recovery["Connection Recovery"]
+        N[Connection Lost] --> O[Exponential Backoff]
+        O --> P{Retry Count < 5?}
+        P -->|Yes| Q[Reconnect]
+        P -->|No| R[Fallback to Polling]
+        Q --> B
+        R --> D
     end
-    
-    subgraph Processing["Result Processing"]
-        M[Game Processors] --> N[MinesResultProcessor]
-        M --> O[PlinkoResultProcessor]
-        M --> P[RouletteResultProcessor]
-        M --> Q[WheelResultProcessor]
-    end
-    
-    C --> D
-    F --> G
-    I --> J
-    L --> M
-    N --> A
-    O --> A
-    P --> A
-    Q --> A
 ```
 
 ## 🎯 User Journey Flow
 
 ```mermaid
 journey
-    title User Gaming Experience
+    title User Gaming Experience with Real-time Updates
     section Discovery
       Visit Website: 5: User
       Browse Games: 4: User
       Read About Fairness: 3: User
     section Onboarding
       Connect Wallet: 3: User
-      Switch Network: 2: User
+      Switch to Somnia Testnet: 2: User
       Verify Connection: 4: User
+      Subscribe to Data Streams: 4: System
     section Gaming
       Select Game: 5: User
       Place Bet: 4: User
-      Wait for Result: 2: User
+      Wait for Entropy: 2: User
       See Outcome: 5: User
+      Receive SDS Notification: 5: System
+    section Social
+      See Other Players' Results: 4: User
+      Real-time Activity Feed: 5: System
+      Community Engagement: 4: User
     section Continuation
       Play Again: 4: User
       Try Different Game: 3: User
       Cash Out: 4: User
 ```
 
-This comprehensive set of Mermaid diagrams provides visual representations of all major architectural components and flows in the APT Casino application, making it easier to understand the complex interactions between different system layers. The diagrams now accurately reflect the current Pyth Entropy integration for random number generation instead of Pyth Entropy.
-## 🎯 
-Smart Account Gaming Benefits
+## 🎯 Smart Account Gaming Benefits
 
 ```mermaid
 graph TB
@@ -653,26 +785,29 @@ graph TB
     end
 ```
 
-## 🔄 Smart Account Transaction Flow
+## 🔄 Smart Account Transaction Flow with SDS
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant UI as Casino UI
     participant SA as Smart Account
-    participant MT as Monad Testnet
+    participant ST as Somnia Testnet
+    participant GL as Game Logger
+    participant SDS as Somnia Data Streams
     participant AS as Arbitrum Sepolia
     participant PE as Pyth Entropy
+    participant AC as All Clients
     
-    Note over U,PE: Smart Account Batch Gaming Session
+    Note over U,AC: Smart Account Batch Gaming Session
     
     U->>UI: Select Multiple Games
     UI->>SA: Prepare Batch Transaction
     
     rect rgb(200, 255, 200)
-        Note over SA,MT: Batch Transaction on Monad
-        SA->>MT: Batch Bet Transaction
-        MT->>SA: Confirm All Bets
+        Note over SA,ST: Batch Transaction on Somnia Testnet
+        SA->>ST: Batch Bet Transaction
+        ST->>SA: Confirm All Bets
     end
     
     rect rgb(200, 200, 255)
@@ -683,17 +818,25 @@ sequenceDiagram
         AS->>UI: All Game Results
     end
     
+    rect rgb(255, 255, 200)
+        Note over GL,SDS: Real-time Broadcast via SDS
+        UI->>GL: Log All Game Results
+        GL->>SDS: Emit GameResultLogged Events
+        SDS->>AC: Broadcast to All Connected Clients
+    end
+    
     rect rgb(255, 200, 200)
-        Note over SA,MT: Batch Payout on Monad
+        Note over SA,ST: Batch Payout on Somnia Testnet
         UI->>SA: Process Batch Payouts
-        SA->>MT: Batch Payout Transaction
-        MT->>SA: Confirm All Payouts
+        SA->>ST: Batch Payout Transaction
+        ST->>SA: Confirm All Payouts
     end
     
     SA->>UI: Update All Game States
     UI->>U: Display All Results
+    AC->>AC: Show Notifications to All Players
     
-    Note over U,PE: Single transaction for multiple games!
+    Note over U,AC: Single transaction for multiple games with real-time updates!
 ```
 
 ## 📊 Performance Comparison: EOA vs Smart Account
@@ -740,3 +883,55 @@ graph LR
     E2 --> U1
     S2 --> U2
 ```
+
+## 📡 Complete Data Streams Integration
+
+```mermaid
+graph TB
+    subgraph Frontend["Frontend Layer"]
+        A[useSomniaStreams Hook] --> B[GlobalNotificationSystem]
+        B --> C[Toast Notifications]
+        B --> D[Activity Feed]
+    end
+    
+    subgraph Service["SomniaStreamsService"]
+        E[SDK Initialization] --> F[Schema Registration]
+        F --> G[Event Subscription]
+        G --> H[Event Processing]
+    end
+    
+    subgraph Config["Configuration"]
+        I[Schema ID: apt-casino-game-result-logged]
+        J[Contract: SomniaGameLogger]
+        K[Protocol: 0x6AB397FF...048Fc]
+    end
+    
+    subgraph EventTypes["Event Types"]
+        L[ROULETTE] --> M[Game Result Event]
+        N[MINES] --> M
+        O[PLINKO] --> M
+        P[WHEEL] --> M
+    end
+    
+    subgraph Delivery["Event Delivery"]
+        Q[WebSocket Primary] --> R{Connected?}
+        R -->|Yes| S[Real-time < 1s]
+        R -->|No| T[HTTP Polling 5s]
+    end
+    
+    A --> E
+    H --> B
+    I --> G
+    J --> G
+    M --> H
+    S --> C
+    T --> C
+```
+
+This comprehensive set of Mermaid diagrams provides visual representations of all major architectural components and flows in the APT Casino Somnia application, featuring:
+
+- **Somnia Testnet** - Main gaming network (Chain ID: 50312)
+- **Somnia Data Streams** - Real-time event broadcasting
+- **Pyth Entropy** - Cryptographically secure randomness on Arbitrum Sepolia
+- **Smart Account Integration** - Enhanced gaming with batch transactions
+- **Real-time Notifications** - Live activity feed for all connected players
