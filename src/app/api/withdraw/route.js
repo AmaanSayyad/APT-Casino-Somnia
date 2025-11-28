@@ -83,7 +83,11 @@ export async function POST(request) {
     console.log('🔧 Treasury account:', treasuryWallet.address);
     console.log('🔧 Amount in Wei:', amountWei.toString());
 
-    // Send transaction from treasury to user
+    console.log('💸 Sending STT from Treasury wallet to user...');
+    
+    // Send STT directly from treasury wallet to user
+    // Note: We use off-chain balance tracking (Redux/localStorage)
+    // The Treasury contract's withdraw() function is for on-chain balance tracking
     const tx = await treasuryWallet.sendTransaction({
       to: formattedUserAddress,
       value: amountWei,

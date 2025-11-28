@@ -529,17 +529,22 @@ export default function Navbar() {
       const TREASURY_ADDRESS = SOMNIA_CONTRACTS[SOMNIA_NETWORKS.TESTNET].treasury;
       
       // Convert amount to Wei (18 decimals)
-      const amountWei = (amount * 10**18).toString();
+      const amountWei = BigInt(Math.floor(amount * 1e18)).toString();
+      const amountHex = '0x' + BigInt(amountWei).toString(16);
       
-      // Send transaction to treasury
+      // Treasury contract deposit() function signature
+      const depositFunctionSignature = '0xd0e30db0'; // deposit()
+      
+      // Send transaction to treasury contract
       const transactionParameters = {
         to: TREASURY_ADDRESS,
         from: userAccount,
-        value: '0x' + parseInt(amountWei).toString(16), // Convert to hex
+        value: amountHex,
+        data: depositFunctionSignature,
         gas: '0x7A120', // 500000 gas limit
       };
       
-      console.log('Sending transaction to MetaMask:', transactionParameters);
+      console.log('Sending deposit transaction to Treasury:', transactionParameters);
       
       // Request transaction from MetaMask
       const txHash = await window.ethereum.request({
