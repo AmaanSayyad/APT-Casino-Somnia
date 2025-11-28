@@ -837,25 +837,6 @@ contract SomniaGameLogger {
 }
 ```
 
-### Integration
-
-```javascript
-import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
-
-const { logGame, getExplorerUrl } = useSomniaGameLogger();
-
-// After game completes
-const txHash = await logGame({
-  gameType: 'ROULETTE',
-  betAmount: '1000000000000000000',
-  result: gameResult,
-  payout: '2000000000000000000',
-  entropyProof: entropyResult.entropyProof
-});
-
-console.log('View on explorer:', getExplorerUrl(txHash));
-```
-
 ### Integration Example
 
 ```javascript
@@ -874,14 +855,6 @@ const txHash = await logGame({
 
 console.log('View on explorer:', getExplorerUrl(txHash));
 ```
-
-## 🚀 Deployment
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- MetaMask wallet with STT tokens
-- Somnia Testnet RPC access
 
 ### Environment Variables
 
@@ -963,8 +936,6 @@ npm run start
    node scripts/test-entropy-all-games.js
    ```
 
-For detailed deployment guide, see [Deployment Summary](./deployments/SOMNIA_DEPLOYMENT_SUMMARY.md).
-
 **How SDS is Used:**
 - Real-time game result notifications using SDS SDK
 - WebSocket subscriptions for instant updates
@@ -1000,9 +971,6 @@ For detailed deployment guide, see [Deployment Summary](./deployments/SOMNIA_DEP
 ### Service Documentation
 - [Somnia Streams Service](./src/services/SOMNIA_STREAMS_SERVICE_README.md) - Detailed service implementation
 - [Game Logger Service](./src/services/GAME_LOGGER_README.md) - On-chain logging details
-
-### Deployment Reports
-- [Somnia Deployment Summary](./deployments/SOMNIA_DEPLOYMENT_SUMMARY.md) - Deployment artifacts
 
 ## 🔧 Development
 
