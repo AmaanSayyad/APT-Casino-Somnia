@@ -11,7 +11,7 @@ lerna-debug.log*
 out/
 build/
 dist/
-
+zetadocs
 # Environment variables
 .env
 .env.local

@@ -54,6 +54,15 @@ module.exports = {
         "User-Agent": "hardhat"
       }
     },
+    'zetachain-testnet': {
+      url: process.env.NEXT_PUBLIC_ZETACHAIN_RPC || "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+      accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],
+      chainId: 7001,
+      timeout: 120000,
+      httpHeaders: {
+        "User-Agent": "hardhat"
+      }
+    },
     localhost: {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
@@ -63,7 +72,8 @@ module.exports = {
     apiKey: {
       arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
-      'somnia-testnet-testnet': "abc" // Blockscout doesn't require API key
+      'somnia-testnet-testnet': "abc", // Blockscout doesn't require API key
+      'zetachain-testnet': "abc" // ZetaChain explorer doesn't require API key
     },
     customChains: [
       {
@@ -72,6 +82,14 @@ module.exports = {
         urls: {
           apiURL: "https://shannon-explorer.somnia.network/api",
           browserURL: "https://shannon-explorer.somnia.network"
+        }
+      },
+      {
+        network: "zetachain-testnet",
+        chainId: 7001,
+        urls: {
+          apiURL: "https://athens.explorer.zetachain.com/api",
+          browserURL: "https://athens.explorer.zetachain.com"
         }
       }
     ]

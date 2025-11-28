@@ -36,6 +36,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setBalance, setLoading, loadBalanceFromStorage } from '@/store/balanceSlice';
 import pythEntropyService from '@/services/PythEntropyService';
 import { useSomniaGameLogger } from '@/hooks/useSomniaGameLogger';
+import { isZetaChainConfigured } from '@/config/zetachainConfig';
 
 // Ethereum client functions will be added here when needed
 
@@ -1190,6 +1191,11 @@ export default function GameRoulette() {
   const [isMuted, setIsMuted] = useState(false);
   const [bettingHistory, setBettingHistory] = useState([]);
   const [error, setError] = useState(null);
+  
+  // ZetaChain logging state
+  const [isZetaChainLogging, setIsZetaChainLogging] = useState(false);
+  const [zetaChainError, setZetaChainError] = useState(null);
+  const [zetaChainEnabled, setZetaChainEnabled] = useState(false);
 
   // Ethereum wallet
   const { address, isConnected } = useAccount();
@@ -1394,6 +1400,35 @@ export default function GameRoulette() {
       fetchRealBalance();
     }
   }, [account?.address, fetchRealBalance]);
+
+  // Check ZetaChain availability (backend handles signing)
+  useEffect(() => {
+    const checkZetaChain = async () => {
+      try {
+        // Check if ZetaChain is configured
+        if (!isZetaChainConfigured()) {
+          console.log('⚠️ ZetaChain not configured');
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // Check if wallet is connected (we need player address)
+        if (!isConnected || !address) {
+          setZetaChainEnabled(false);
+          return;
+        }
+
+        // ZetaChain is available (backend will handle signing)
+        setZetaChainEnabled(true);
+        console.log('✅ ZetaChain logging available for Roulette (backend signing)');
+      } catch (error) {
+        console.error('❌ Failed to check ZetaChain availability:', error);
+        setZetaChainEnabled(false);
+      }
+    };
+
+    checkZetaChain();
+  }, [isConnected, address]);
 
   // insert into events
   const insertEvent = (type, oldVal, newVal, ind = 0) => {
@@ -2078,6 +2113,68 @@ export default function GameRoulette() {
           }).catch(error => {
             console.warn('⚠️ Failed to log Roulette game to Somnia:', error);
           });
+          
+          // Log game result to ZetaChain via backend API (optional, non-blocking)
+          if (zetaChainEnabled) {
+            setIsZetaChainLogging(true);
+            setZetaChainError(null);
+            
+            // Send to backend API for ZetaChain logging
+            fetch('/api/zetachain/log-game', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                gameType: 'ROULETTE',
+                playerAddress: address,
+                betAmount: totalBetAmount.toString(),
+                result: {
+                  winningNumber: winningNumber,
+                  bets: allBets,
+                  winningBets: winningBets,
+                  losingBets: losingBets,
+                  totalPayout: totalPayout,
+                  netResult: netResult
+                },
+                payout: Math.max(0, netResult).toString(),
+                entropyProof: {
+                  requestId: entropyResult.entropyProof.requestId,
+                  transactionHash: entropyResult.entropyProof.transactionHash
+                }
+              })
+            })
+            .then(async (response) => {
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Backend error: ${errorText}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success && data.txHash) {
+                console.log('✅ Roulette game logged to ZetaChain:', data.explorerUrl);
+                // Update betting history with ZetaChain transaction hash
+                setBettingHistory(prev => {
+                  const updatedHistory = [...prev];
+                  if (updatedHistory.length > 0) {
+                    updatedHistory[0] = { ...updatedHistory[0], zetachainTxHash: data.txHash };
+                  }
+                  return updatedHistory;
+                });
+              }
+              setIsZetaChainLogging(false);
+            })
+            .catch(error => {
+              console.warn('⚠️ Failed to log Roulette game to ZetaChain:', error);
+              setZetaChainError(error.message || 'Failed to log to ZetaChain');
+              setIsZetaChainLogging(false);
+              
+              // Show error notification but don't block game
+              setSnackbarMessage(`ZetaChain logging failed: ${error.message || 'Unknown error'}`);
+              setSnackbarOpen(true);
+            });
+          } else {
+            console.log('ℹ️ ZetaChain logging disabled or not configured');
+          }
           
           // Fire-and-forget explorer log via casino wallet
           try {
@@ -3304,6 +3401,28 @@ export default function GameRoulette() {
                             : `1 bet selected`;
                         })()}
                       </Typography>
+                    )}
+                    
+                    {/* ZetaChain logging status indicator */}
+                    {zetaChainEnabled && (
+                      <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                        {isZetaChainLogging ? (
+                          <>
+                            <CircularProgress size={16} sx={{ color: 'primary.main' }} />
+                            <Typography variant="caption" color="primary.main">
+                              Logging to ZetaChain...
+                            </Typography>
+                          </>
+                        ) : zetaChainError ? (
+                          <Typography variant="caption" color="error.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            ⚠️ ZetaChain: {zetaChainError}
+                          </Typography>
+                        ) : (
+                          <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            ✓ ZetaChain logging enabled
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   </Box>
                 )}

@@ -1,0 +1,9 @@
+{
+  "network": "zetachain-testnet",
+  "chainId": 7001,
+  "contractAddress": "0xacA996A4d49e7Ed42dA68a20600F249BE6d024A4",
+  "deployer": "0xb424d2369F07b925D1218B08e56700AF5928287b",
+  "deploymentTime": "2025-11-28T17:34:00.338Z",
+  "transactionHash": "0xf0c93101d641298e20c5e683e2a10f917a3bad86c06c7a25853d9ab38a9bc315",
+  "blockNumber": null
+}
